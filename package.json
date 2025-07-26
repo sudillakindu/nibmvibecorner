@@ -1,0 +1,44 @@
+{
+  "name": "nibm-club",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "preview": "npx vite preview",
+    "netlify:dev": "netlify dev"
+  },
+  "dependencies": {
+    "@getbrevo/brevo": "^2.5.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "disposable-email-domains-js": "^1.15.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "firebase": "^12.0.0",
+    "lucide-react": "^0.441.0",
+    "nodemailer": "^7.0.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.18",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "latest",
+    "eslint": "^8.50.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "netlify-cli": "^17.0.0",
+    "postcss": "latest",
+    "tailwindcss": "3.4.17",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.0"
+  }
+}

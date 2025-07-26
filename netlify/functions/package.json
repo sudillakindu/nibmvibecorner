@@ -1,0 +1,9 @@
+{
+  "name": "nibm-club-functions",
+  "version": "1.0.0",
+  "description": "NIBM Club functions for email sending",
+  "main": "index.js",
+  "dependencies": {
+    "nodemailer": "^7.0.5"
+  }
+} 

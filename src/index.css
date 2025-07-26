@@ -1,0 +1,212 @@
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Raleway:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap');
+:root {
+  --color-mustard: #F4C430;
+  --color-chocolate: #5C4033;
+  --color-sand: #C19A6B;
+  --color-saddle: #8B4513;
+  --color-soft-orange: #FFB347;
+  --color-cream: #EEE2DC;
+  --color-dark-brown: #3B2F2F;
+  --color-white: #FFFFFF;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  scroll-behavior: smooth;
+}
+/* Float animations for decorative elements */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+@keyframes float-delay {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+@keyframes float-slow {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(92, 64, 51, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(244, 196, 48, 0.7);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-delay {
+  animation: float-delay 8s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float-slow 10s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(238, 226, 220, 0), 
+    rgba(244, 196, 48, 0.2), 
+    rgba(238, 226, 220, 0)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+/* Fade animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+.animate-fadeDown {
+  animation: fadeDown 0.3s ease-out forwards;
+}
+/* Confetti animation */
+.confetti {
+  position: absolute;
+  z-index: 1;
+  animation: confetti-fall 3s ease-in-out forwards;
+}
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(1000px) rotate(720deg);
+    opacity: 0;
+  }
+}
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+.delay-75 {
+  animation-delay: 0.75s;
+}
+.delay-150 {
+  animation-delay: 1.5s;
+}
+/* Glassmorphism styles */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.glass-dark {
+  background: rgba(59, 47, 47, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.glass-brown {
+  background: rgba(92, 64, 51, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(92, 64, 51, 0.2);
+}
+/* Text gradient */
+.text-gradient-mustard {
+  background: linear-gradient(to right, #F4C430, #FFB347);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-chocolate {
+  background: linear-gradient(to right, #5C4033, #8B4513);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-sand {
+  background: linear-gradient(to right, #C19A6B, #EEE2DC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+/* Paper texture background */
+.bg-paper {
+  background-color: var(--color-cream);
+  background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+}
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-chocolate);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mustard);
+}
