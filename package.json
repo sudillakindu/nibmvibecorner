@@ -41,7 +41,7 @@
     "eslint-plugin-react-refresh": "^0.4.1",
     "netlify-cli": "^17.0.0",
     "postcss": "latest",
-    "rollup": "^4.45.3",
+    "rollup": "^3.29.4",
     "tailwindcss": "3.4.17",
     "typescript": "^5.5.4",
     "vite": "^5.2.0"
@@ -49,22 +49,6 @@
   "overrides": {
     "rollup": {
       "fsevents": "~2.3.3"
-    },
-    "@rollup/rollup-android-arm-eabi": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-android-arm64": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-darwin-arm64": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-darwin-x64": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-arm-gnueabihf": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-arm64-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-arm64-musl": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-ia32-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-mips64el-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-powerpc64-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-riscv64-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-s390x-gnu": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-linux-x64-musl": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-win32-arm64-msvc": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-win32-ia32-msvc": "npm:@rollup/rollup-linux-x64-gnu@4.22.4",
-    "@rollup/rollup-win32-x64-msvc": "npm:@rollup/rollup-linux-x64-gnu@4.22.4"
+    }
   }
 }
