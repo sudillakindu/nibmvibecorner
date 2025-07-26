@@ -1,7 +1,7 @@
 [build]
   publish = "dist"
   functions = "netlify/functions"
-  command = "npm ci --ignore-engines --platform=linux --arch=x64 --omit=optional && npm run build"
+  command = "npm ci --ignore-engines --platform=linux --arch=x64 --omit=optional --ignore-scripts && npm run build"
 
 [build.environment]
   NODE_VERSION = "20.18.0"
