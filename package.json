@@ -49,6 +49,7 @@
   "overrides": {
     "rollup": {
       "fsevents": "~2.3.3"
-    }
+    },
+    "@rollup/rollup-android-arm-eabi": "npm:@rollup/rollup-linux-x64-gnu@4.22.4"
   }
 }
