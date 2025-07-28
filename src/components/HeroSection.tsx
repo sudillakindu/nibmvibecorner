@@ -68,7 +68,7 @@ export const HeroSection = () => {
           <a 
             href="#join" 
             onClick={handleSmoothScroll('join')}
-            className="group px-6 sm:px-10 py-3 sm:py-4 bg-mustard-500 text-chocolate-700 font-medium rounded-full hover:shadow-glow transition-all transform hover:scale-105 hover:bg-mustard-400 relative overflow-hidden text-sm sm:text-base cursor-pointer"
+            className="group px-6 sm:px-10 py-3 sm:py-4 bg-mustard-500 text-chocolate-700 font-medium rounded-full hover:shadow-glow transition-all transform hover:scale-105 hover:bg-mustard-400 relative overflow-hidden text-base sm:text-lg cursor-pointer flex items-center justify-center"
           >
             <span className="relative z-10">Join Now</span>
             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-mustard-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -76,7 +76,7 @@ export const HeroSection = () => {
           <a 
             href="#events" 
             onClick={handleSmoothScroll('events')}
-            className="px-6 sm:px-10 py-3 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium rounded-full hover:bg-white/20 transition-all transform hover:scale-105 hover:shadow-lg hover:border-mustard-500/50 text-sm sm:text-base cursor-pointer"
+            className="px-6 sm:px-10 py-3 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium rounded-full hover:bg-white/20 transition-all transform hover:scale-105 hover:shadow-lg hover:border-mustard-500/50 text-base sm:text-lg cursor-pointer flex items-center justify-center"
           >
             Explore Events
           </a>

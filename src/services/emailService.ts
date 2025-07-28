@@ -1,6 +1,7 @@
 interface ClubApplicationEmailData {
   name: string;
   email: string;
+  studentIndexId: string;
   faculty: string;
   year: string;
   interests: string[];

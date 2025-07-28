@@ -219,13 +219,13 @@ export const SignUp = () => {
                     const emailSent = await sendSignupApplicationEmail(emailData);
                     
                     if (emailSent) {
-                        showToast('success', 'Account created successfully! Welcome to Liberate! Check your email for confirmation.');
+                        showToast('success', 'Account created successfully! Welcome to NIBM VibeCorner Club! Check your email for confirmation.');
                     } else {
-                        showToast('success', 'Account created successfully! Welcome to Liberate! (Email notification failed)');
+                        showToast('success', 'Account created successfully! Welcome to NIBM VibeCorner Club! (Email notification failed)');
                     }
                 } catch (emailError) {
                     console.error('Error sending confirmation email:', emailError);
-                    showToast('success', 'Account created successfully! Welcome to Liberate! (Email notification failed)');
+                    showToast('success', 'Account created successfully! Welcome to NIBM VibeCorner Club! (Email notification failed)');
                 }
 
                 // Store user data in localStorage
@@ -235,9 +235,9 @@ export const SignUp = () => {
                 }));
 
                 // Redirect to home page after a short delay
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 3000);
+                // setTimeout(() => {
+                //     window.location.href = '/';
+                // }, 3000);
             } else {
                 throw new Error('Failed to create user');
             }
@@ -260,8 +260,8 @@ export const SignUp = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        <span className="bg-gradient-to-r from-mustard-500 to-mustard-600 bg-clip-text text-transparent font-serif">Libe</span>
-                        <span className="text-chocolate-700">rate</span>
+                        <span className="bg-gradient-to-r from-mustard-500 to-mustard-600 bg-clip-text text-transparent font-serif">Vibe</span>
+                        <span className="text-chocolate-700">Corner</span>
                     </h1>
                     <h2 className="text-2xl font-bold text-charcoal-700 dark:text-white mb-2">
                         Create Account

@@ -80,7 +80,7 @@ exports.handler = async (event, context) => {
     const confirmationMailOptions = {
       from: process.env.VITE_GMAIL_USER,
       to: email,
-      subject: 'Welcome to Liberate! - Application Confirmation',
+      subject: 'Welcome to NIBM VibeCorner Club! - Application Confirmation',
       html: confirmationHtml,
     };
 
@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
     const notificationMailOptions = {
       from: process.env.VITE_GMAIL_USER,
       to: process.env.VITE_ADMIN_GMAIL_USER, 
-      subject: 'New Liberate Club Application',
+      subject: 'New NIBM VibeCorner Club Application',
       html: notificationHtmlContent,
     };
 

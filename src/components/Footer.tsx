@@ -88,9 +88,9 @@ export const Footer = () => {
           <div className="text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-2">
               <span className="text-mustard-500 bg-gradient-to-r from-mustard-400 to-orange-500 bg-clip-text text-transparent">
-                Libe
+                Vibe
               </span>
-              <span className="text-white">rate</span>
+              <span className="text-white">Corner</span>
             </h2>
           </div>
         </div>

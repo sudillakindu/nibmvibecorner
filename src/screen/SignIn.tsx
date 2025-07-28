@@ -103,9 +103,9 @@ export const SignIn = () => {
             showToast('success', 'Welcome back! Sign in successful');
 
             // Redirect to home page after a short delay
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1500);
+            // setTimeout(() => {
+            //     window.location.href = '/';
+            // }, 1500);
 
         } catch (error) {
             console.error('Sign in error:', error);
@@ -125,8 +125,8 @@ export const SignIn = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        <span className="bg-gradient-to-r from-mustard-500 to-mustard-600 bg-clip-text text-transparent font-serif">Libe</span>
-                        <span className="text-chocolate-700">rate</span>
+                        <span className="bg-gradient-to-r from-mustard-500 to-mustard-600 bg-clip-text text-transparent font-serif">Vibe</span>
+                        <span className="text-chocolate-700">Corner</span>
                     </h1>
                     <h2 className="text-2xl font-bold text-charcoal-700 dark:text-white mb-2">
                         Welcome Back

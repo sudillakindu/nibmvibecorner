@@ -62,7 +62,7 @@ exports.handler = async (event, context) => {
     }
 
     // Create transporter for Gmail
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.VITE_GMAIL_USER,
@@ -84,7 +84,7 @@ exports.handler = async (event, context) => {
     const confirmationMailOptions = {
       from: process.env.VITE_GMAIL_USER,
       to: email,
-      subject: 'Welcome to Liberate! - Account Created Successfully',
+      subject: 'Welcome to NIBM VibeCorner Club! - Account Created Successfully',
       html: confirmationHtml,
     };
 
@@ -110,7 +110,7 @@ exports.handler = async (event, context) => {
     const notificationMailOptions = {
       from: process.env.VITE_GMAIL_USER,
       to: process.env.VITE_ADMIN_GMAIL_USER, 
-      subject: 'New User Registration - Liberate Platform',
+      subject: 'New User Registration - NIBM VibeCorner Club Platform',
       html: notificationHtmlContent,
     };
 

@@ -28,8 +28,6 @@ export function App() {
       setCurrentPage('dashboard');
     } else if (path === '/join-us') {
       setCurrentPage('join-us');
-    } else if (path === '/event') {
-      setCurrentPage('event');
     } else {
       setCurrentPage('home');
     }
