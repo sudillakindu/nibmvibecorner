@@ -1,15 +1,15 @@
-import React, { useState, createElement, useEffect } from 'react';
+import React, { useState, createElement, useEffect, useRef } from 'react';
 import { CheckIcon } from 'lucide-react';
 import { ref, push, set, get, query, orderByChild, equalTo } from 'firebase/database';
 import { database } from '../firebase/firebase';
-import Toast, { ToastType } from './Toast';
 import { isDisposableEmail, isDisposableEmailDomain } from 'disposable-email-domains-js';
-import { sendConfirmationEmail } from '../services/emailService';
+import { sendClubApplicationEmail } from '../services/emailService';
 
 export const JoinSection = () => {
     const [formState, setFormState] = useState({
         name: '',
         email: '',
+        studentIndexId: '',
         faculty: '',
         year: '',
         interests: [] as string[],
@@ -21,10 +21,57 @@ export const JoinSection = () => {
     const [fieldErrors, setFieldErrors] = useState({
         name: '',
         email: '',
+        studentIndexId: '',
         faculty: '',
         year: '',
         interests: ''
     });
+    const sectionRef = useRef<HTMLElement>(null);
+
+    // Add scroll animation effect
+    useEffect(() => {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target as HTMLElement;
+                    element.classList.add('animate-fadeIn');
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                    
+                    // Animate child elements with staggered delays
+                    const titleSection = element.querySelector('.text-center') as HTMLElement;
+                    const formContainer = element.querySelector('.max-w-5xl') as HTMLElement;
+                    
+                    if (titleSection) {
+                        setTimeout(() => {
+                            titleSection.style.opacity = '1';
+                            titleSection.style.transform = 'translateY(0)';
+                        }, 200);
+                    }
+                    
+                    if (formContainer) {
+                        setTimeout(() => {
+                            formContainer.style.opacity = '1';
+                            formContainer.style.transform = 'translateY(0) scale(1)';
+                        }, 300);
+                    }
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) {
+                observer.unobserve(sectionRef.current);
+            }
+        };
+    }, []);
 
     // Add email validation function
     const validateEmail = (email: string) => {
@@ -34,7 +81,7 @@ export const JoinSection = () => {
 
     // WhatsApp data state
     const [whatsappData, setWhatsappData] = useState({
-        alt_contact: '',
+        alt_contact1: '',
         alt_contact_message1: ''
     });
 
@@ -42,13 +89,13 @@ export const JoinSection = () => {
     useEffect(() => {
         const fetchWhatsappData = async () => {
             try {
-                const systemRef = ref(database, 'system/whatsapp');
-                const snapshot = await get(systemRef);
+                const whatsappRef = ref(database, 'whatsapp/alt_whatsapp');
+                const snapshot = await get(whatsappRef);
 
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     setWhatsappData({
-                        alt_contact: data.alt_contact || '',
+                        alt_contact1: data.alt_contact1 || '',
                         alt_contact_message1: data.alt_contact_message1 || ''
                     });
                 }
@@ -63,10 +110,21 @@ export const JoinSection = () => {
     // Add new error state for each field
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormState(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        
+        // Special handling for studentIndexId field
+        if (name === 'studentIndexId') {
+            // Convert to uppercase and only allow letters, numbers, spaces, dots, and dashes
+            const filteredValue = value.toUpperCase().replace(/[^A-Z0-9\s-]/g, '');
+            setFormState(prev => ({
+                ...prev,
+                [name]: filteredValue
+            }));
+        } else {
+            setFormState(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
 
         // Clear field error when user starts typing/selecting
         setFieldErrors(prev => ({
@@ -130,7 +188,7 @@ export const JoinSection = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        let errors = { name: '', email: '', faculty: '', year: '', interests: '' };
+        let errors = { name: '', email: '', studentIndexId: '', faculty: '', year: '', interests: '' };
         let hasError = false;
         if (!formState.name.trim()) {
             errors.name = 'Please enter your full name.';
@@ -147,6 +205,10 @@ export const JoinSection = () => {
             hasError = true;
         } else if (emailExists) {
             errors.email = 'This email has already been used. Please use a different email.';
+            hasError = true;
+        }
+        if (!formState.studentIndexId.trim()) {
+            errors.studentIndexId = 'Please enter your NIBM student ID.';
             hasError = true;
         }
         if (!formState.faculty) {
@@ -185,7 +247,7 @@ export const JoinSection = () => {
 
             // Send confirmation email
             try {
-                const emailSent = await sendConfirmationEmail(applicationData);
+                const emailSent = await sendClubApplicationEmail(applicationData);
                 if (emailSent) {
                     console.log('Confirmation email sent successfully');
                 } else {
@@ -204,6 +266,7 @@ export const JoinSection = () => {
                 setFormState({
                     name: '',
                     email: '',
+                    studentIndexId: '',
                     faculty: '',
                     year: '',
                     interests: [],
@@ -270,14 +333,14 @@ export const JoinSection = () => {
   };
 
     return (
-        <section id="join" className="py-12 md:py-20 px-4 bg-gradient-to-br from-cream-50 via-white to-cream-100 dark:from-saddle-900/30 dark:via-charcoal-900 dark:to-saddle-900/20 relative overflow-hidden">
+        <section id="join" ref={sectionRef} className="py-12 md:py-20 px-4 bg-gradient-to-br from-cream-50 via-white to-cream-100 dark:from-saddle-900/30 dark:via-charcoal-900 dark:to-saddle-900/20 relative overflow-hidden opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
             {/* Enhanced decorative elements */}
             <div className="absolute top-10 left-5 w-40 h-40 md:w-80 md:h-80 rounded-full bg-chocolate-700/10 blur-3xl animate-float"></div>
             <div className="absolute bottom-10 right-5 w-60 h-60 md:w-96 md:h-96 rounded-full bg-mustard-500/10 blur-3xl animate-float-delay"></div>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-orange-500/5 blur-2xl animate-float-slow"></div>
 
             <div className="container mx-auto relative z-10 max-w-6xl">
-                <div className="text-center mb-8 md:mb-12">
+                <div className="text-center mb-8 md:mb-12 opacity-0 transform translate-y-8 transition-all duration-1000 ease-out delay-200">
                     <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-chocolate-700 to-mustard-600 bg-clip-text text-transparent">
                         Join Our Club
                     </h2>
@@ -287,7 +350,7 @@ export const JoinSection = () => {
                     </p>
                 </div>
 
-                <div className="max-w-5xl mx-auto backdrop-blur-xl bg-white/80 dark:bg-charcoal-900/80 rounded-3xl shadow-2xl overflow-hidden border border-white/30 dark:border-chocolate-700/30">
+                <div className="max-w-5xl mx-auto backdrop-blur-xl bg-white/80 dark:bg-charcoal-900/80 rounded-3xl shadow-2xl overflow-hidden border border-white/30 dark:border-chocolate-700/30 opacity-0 transform translate-y-8 scale-95 transition-all duration-1000 ease-out delay-300">
                     <div className="grid grid-cols-1 lg:grid-cols-5">
                         {/* Left side - Benefits */}
                         <div className="lg:col-span-2 bg-gradient-to-br from-chocolate-700 via-saddle-700 to-chocolate-800 text-white p-8 md:p-10 relative overflow-hidden">
@@ -382,7 +445,7 @@ export const JoinSection = () => {
                                         </div>
                                         <div className="mt-6">
                                             <a
-                                                href={`https://wa.me/${whatsappData.alt_contact}?text=${encodeURIComponent(whatsappData.alt_contact_message1)}`}
+                                                href={`https://wa.me/${whatsappData.alt_contact1}?text=${encodeURIComponent(whatsappData.alt_contact_message1)}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-105 hover:shadow-lg text-sm shadow-md"
@@ -460,6 +523,36 @@ export const JoinSection = () => {
                                                 <span>This email has already been used for an application.</span>
                                             </div>
                                         ) : null}
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label htmlFor="studentIndexId" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                            Student Index ID
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="studentIndexId"
+                                            name="studentIndexId"
+                                            value={formState.studentIndexId}
+                                            onChange={handleChange}
+                                            placeholder="Enter your NIBM student ID (e.g : MADSE241F-001)"
+                                            pattern="[A-Z0-9\s-]+"
+                                            title="Only capital letters, numbers, spaces, dots, and dashes are allowed"
+                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                        placeholder-charcoal-400 dark:placeholder-cream-600
+                                                        text-charcoal-800 dark:text-white
+
+                                                        focus:outline-none
+                                                        focus:ring-0
+                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                        />
+                                        {fieldErrors.studentIndexId && (
+                                            <div className="flex items-center mt-2 text-red-600 dark:text-red-400 text-sm">
+                                                <span>{fieldErrors.studentIndexId}</span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="space-y-1">

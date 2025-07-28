@@ -4,44 +4,55 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 const galleryImages = [
   {
     id: 1,
-    src: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+    src: 'https://i.ibb.co/V0LL68LT/486835266-615250928172283-4047603257840771054-n.jpg',
     alt: 'Students enjoying a club event',
     reactions: {
       '🥰': 24,
-      '😂': 18,
+      '😂': 0,
       '🔥': 32
     },
     type: 'image'
   },
   {
     id: 2,
-    src: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f8e1c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80',
-    alt: 'Music performance at campus',
+    src: 'https://i.ibb.co/TB3HsQpK/491260197-636704766026899-2031246333511283258-n.jpg',
+    alt: 'Students meditating outdoors',
     reactions: {
       '🥰': 42,
-      '😂': 5,
+      '😂': 0,
       '🔥': 28
     },
     type: 'image'
   },
   {
     id: 3,
-    src: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
-    alt: 'Drama performance',
+    src: 'https://i.ibb.co/5g8rmLq5/1747936328603.jpg',
+    alt: 'Students enjoying a club event',
     reactions: {
       '🥰': 19,
-      '😂': 27,
+      '😂': 0,
       '🔥': 15
     },
     type: 'image'
   },
   {
     id: 4,
-    src: 'https://images.unsplash.com/photo-1472653431158-6364773b2a56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
+    src: 'https://i.ibb.co/XxPfPN4r/484383399-604348892595820-1486979467841199384-n.jpg',
     alt: 'Students meditating outdoors',
     reactions: {
       '🥰': 36,
-      '😂': 2,
+      '😂': 0,
+      '🔥': 8
+    },
+    type: 'image'
+  },
+  {
+    id: 5,
+    src: 'https://i.ibb.co/m5P8v4Cb/1747936333343.jpg',
+    alt: 'Students meditating outdoors',
+    reactions: {
+      '🥰': 36,
+      '😂': 0,
       '🔥': 8
     },
     type: 'image'
@@ -53,6 +64,7 @@ export const GallerySection = () => {
   const [userReactions, setUserReactions] = useState<Record<number, string | null>>({});
   const [hoveredImage, setHoveredImage] = useState<number | null>(null);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const nextSlide = () => {
     setCurrentSlide(prev => (prev + 1) % galleryImages.length);
@@ -141,20 +153,59 @@ export const GallerySection = () => {
     }
   };
 
+  // Add scroll animation effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const element = entry.target as HTMLElement;
+          element.classList.add('animate-fadeIn');
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+          
+          // Animate child elements with staggered delays
+          const titleSection = element.querySelector('.text-center') as HTMLElement;
+          const galleryContainer = element.querySelector('.relative.max-w-5xl') as HTMLElement;
+          
+          if (titleSection) {
+            setTimeout(() => {
+              titleSection.style.opacity = '1';
+              titleSection.style.transform = 'translateY(0)';
+            }, 200);
+          }
+          
+          if (galleryContainer) {
+            setTimeout(() => {
+              galleryContainer.style.opacity = '1';
+              galleryContainer.style.transform = 'translateY(0) scale(1)';
+            }, 300);
+          }
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section id="gallery" className="py-16 md:py-24 px-4 bg-paper dark:bg-charcoal-800 relative overflow-hidden">
+    <section id="gallery" ref={sectionRef} className="py-16 md:py-20 px-4 bg-paper dark:bg-charcoal-800 relative overflow-hidden opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] md:w-[800px] md:h-[800px] rounded-full bg-chocolate-700/5 blur-3xl -translate-y-1/2 translate-x-1/4"></div>
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] md:w-[800px] md:h-[800px] rounded-full bg-mustard-500/5 blur-3xl translate-y-1/3 -translate-x-1/4"></div>
       
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center mb-2 bg-cream-500 dark:bg-saddle-900/30 px-3 md:px-4 py-1 md:py-1.5 rounded-full">
-            <span className="text-lg md:text-xl mr-2">📸</span>
-            <span className="text-chocolate-700 dark:text-sand-300 text-xs md:text-sm font-medium">
-              Our Memories
-            </span>
-          </div>
+        <div className="text-center mb-12 md:mb-16 opacity-0 transform translate-y-8 transition-all duration-1000 ease-out delay-200">
           <h2 className="text-2xl md:text-3xl lg:text-5xl font-bold mt-2 mb-4 text-mustard-500 dark:text-white">
             Gallery
           </h2>
@@ -163,7 +214,7 @@ export const GallerySection = () => {
           </p>
         </div>
 
-        <div className="relative max-w-5xl mx-auto" onMouseEnter={pauseAutoplay} onMouseLeave={resumeAutoplay}>
+        <div className="relative max-w-5xl mx-auto opacity-0 transform translate-y-8 scale-95 transition-all duration-1000 ease-out delay-300" onMouseEnter={pauseAutoplay} onMouseLeave={resumeAutoplay}>
           {/* Carousel */}
           <div className="overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl">
             <div 

@@ -7,11 +7,33 @@ export const AboutSection = () => {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fadeIn');
+          const element = entry.target as HTMLElement;
+          element.classList.add('animate-fadeIn');
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+          
+          // Animate child elements with staggered delays
+          const imageSection = element.querySelector('.order-2.lg\\:order-1') as HTMLElement;
+          const contentSection = element.querySelector('.order-1.lg\\:order-2') as HTMLElement;
+          
+          if (imageSection) {
+            setTimeout(() => {
+              imageSection.style.opacity = '1';
+              imageSection.style.transform = 'translateX(0)';
+            }, 200);
+          }
+          
+          if (contentSection) {
+            setTimeout(() => {
+              contentSection.style.opacity = '1';
+              contentSection.style.transform = 'translateX(0)';
+            }, 300);
+          }
         }
       });
     }, {
-      threshold: 0.1
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
     });
 
     if (sectionRef.current) {
@@ -26,11 +48,11 @@ export const AboutSection = () => {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="py-16 md:py-24 px-4 bg-paper dark:bg-charcoal-800 opacity-0">
+    <section id="about" ref={sectionRef} className="py-16 md:py-20 px-4 bg-paper dark:bg-charcoal-800 opacity-0 transform translate-y-8 transition-all duration-1000 ease-out">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Image Section */}
-          <div className="relative order-2 lg:order-1">
+          <div className="relative order-2 lg:order-1 opacity-0 transform translate-x-8 transition-all duration-1000 ease-out delay-200">
             <div className="absolute -top-4 -left-4 md:-top-6 md:-left-6 w-16 h-16 md:w-24 md:h-24 bg-mustard-500 rounded-full opacity-20"></div>
             <div className="relative overflow-hidden rounded-2xl shadow-xl z-10">
               <img 
@@ -50,13 +72,7 @@ export const AboutSection = () => {
           </div>
 
           {/* Content Section */}
-          <div className="order-1 lg:order-2">
-            <div className="inline-flex items-center mb-2 bg-cream-500 dark:bg-saddle-900/30 px-3 md:px-4 py-1 md:py-1.5 rounded-full">
-              <span className="text-lg md:text-xl mr-2">🎭</span>
-              <span className="text-chocolate-700 dark:text-sand-300 text-xs md:text-sm font-medium">
-                About Us
-              </span>
-            </div>
+          <div className="order-1 lg:order-2 opacity-0 transform -translate-x-8 transition-all duration-1000 ease-out delay-300">
             
             <h2 className="text-2xl md:text-3xl lg:text-5xl font-bold mt-2 mb-4 md:mb-6 text-mustard-500 dark:text-white">
               We Create Spaces for Self-Expression

@@ -1,8 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { ref, get } from 'firebase/database';
+import { database } from '../firebase/firebase';
 
 export const WhatsAppButton = () => {
+  const [whatsappLink, setWhatsappLink] = useState(''); // Default fallback
+
+  // Fetch WhatsApp community link from Firebase
+  useEffect(() => {
+    const fetchWhatsappLink = async () => {
+      try {
+        const whatsappRef = ref(database, 'whatsapp/community_whatsapp');
+        const snapshot = await get(whatsappRef);
+        
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          if (data.whatsapp_community) {
+            setWhatsappLink(data.whatsapp_community);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching WhatsApp community link:', error);
+        // Continue with default link if Firebase fails
+      }
+    };
+
+    fetchWhatsappLink();
+  }, []);
+
   const handleClick = () => {
-    window.open('https://chat.whatsapp.com/your-group-link', '_blank', 'noopener,noreferrer'); // Replace with your actual WhatsApp group link
+    window.open(whatsappLink, '_blank', 'noopener,noreferrer');
   };
 
   return (

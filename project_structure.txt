@@ -1,0 +1,122 @@
+NIBM CLUB PROJECT STRUCTURE
+============================
+
+217001ac-89ca-42ad-89ea-de8f8f436a2c/
+├── Configuration Files
+│   ├── package.json (1.3KB, 55 lines)
+│   ├── package-lock.json (832KB, 22664 lines)
+│   ├── vite.config.ts (1.1KB, 36 lines)
+│   ├── tailwind.config.js (3.4KB, 123 lines)
+│   ├── postcss.config.js (80B, 7 lines)
+│   ├── tsconfig.json (605B, 26 lines)
+│   ├── tsconfig.node.json (233B, 12 lines)
+│   ├── .eslintrc.cjs (436B, 19 lines)
+│   ├── .gitignore (286B, 28 lines)
+│   ├── .nvmrc (8B, 1 line)
+│   ├── .npmrc (65B, 4 lines)
+│   └── env.example (730B, 19 lines)
+│
+├── Firebase Configuration
+│   ├── firebase.json (193B, 14 lines)
+│   ├── .firebaserc (50B, 6 lines)
+│   └── .firebase/ (directory)
+│
+├── Netlify Configuration
+│   ├── netlify.toml (419B, 19 lines)
+│   └── .netlify/ (directory)
+│
+├── src/ (Main Source Code)
+│   ├── App.tsx (2.6KB, 83 lines)
+│   ├── index.tsx (163B, 5 lines)
+│   ├── index.css (4.6KB, 212 lines)
+│   ├── vite-env.d.ts (547B, 18 lines)
+│   │
+│   ├── components/ (UI Components)
+│   │   ├── Header.tsx (8.5KB, 222 lines)
+│   │   ├── HeroSection.tsx (5.3KB, 95 lines)
+│   │   ├── AboutSection.tsx (6.1KB, 123 lines)
+│   │   ├── EventsSection.tsx (4.8KB, 106 lines)
+│   │   ├── GallerySection.tsx (11KB, 268 lines)
+│   │   ├── JoinSection.tsx (42KB, 695 lines)
+│   │   ├── Footer.tsx (4.2KB, 108 lines)
+│   │   ├── WhatsAppButton.tsx (2.6KB, 47 lines)
+│   │   └── MusicToggle.tsx (1.8KB, 51 lines)
+│   │
+│   ├── screen/ (Page Components)
+│   │   ├── SignIn.tsx (13KB, 286 lines)
+│   │   ├── SignUp.tsx (28KB, 559 lines)
+│   │   └── dashboard/
+│   │       └── Dashboard.tsx (24KB, 600 lines)
+│   │
+│   ├── services/ (Business Logic)
+│   │   └── emailService.ts (2.4KB, 87 lines)
+│   │
+│   ├── ui/ (Reusable UI Components)
+│   │   └── Toast.tsx (5.8KB, 161 lines)
+│   │
+│   └── firebase/ (Firebase Configuration)
+│       └── firebase.ts (766B, 20 lines)
+│
+├── netlify/ (Serverless Functions)
+│   └── functions/
+│       ├── package.json (198B, 9 lines)
+│       ├── package-lock.json (692B, 28 lines)
+│       ├── netlify.toml (297B, 17 lines)
+│       ├── node_modules/ (directory)
+│       │
+│       ├── server/ (Email Services)
+│       │   ├── signupApplicationEmail.js (5.7KB, 145 lines)
+│       │   └── clubApplicationEmail.js (4.8KB, 138 lines)
+│       │
+│       ├── emailTemplate/ (Email Templates)
+│       │   ├── signupApplicationConfirmation.html (8.8KB, 304 lines)
+│       │   ├── signupApplicationNotification.html (12KB, 398 lines)
+│       │   ├── clubApplicationConfirmation.html (6.7KB, 244 lines)
+│       │   └── clubApplicationNotification.html (11KB, 395 lines)
+│       │
+│       └── firebase/ (Firebase Admin)
+│           └── firebase.js (798B, 21 lines)
+│
+├── node_modules/ (Dependencies)
+├── dist/ (Build Output)
+├── index.html (370B, 14 lines)
+├── README.md (257B, 9 lines)
+└── 217001ac-89ca-42ad-89ea-de8f8f436a2c.rar (154KB, 646 lines)
+
+================================================================
+
+PROJECT OVERVIEW
+================
+
+Frontend Stack:
+- React 18 with TypeScript
+- Vite for fast development and building
+- Tailwind CSS for utility-first styling
+- Component-based architecture
+
+Backend Services:
+- Firebase for authentication, database, and hosting
+- Netlify Functions for serverless backend operations
+- Email services for club applications and notifications
+
+Key Features:
+- Landing Page with multiple sections (Hero, About, Events, Gallery, Join)
+- User Authentication (Sign In/Sign Up)
+- Dashboard for user management
+- Club Application System with email notifications
+- Responsive Design with modern UI components
+
+Development Tools:
+- ESLint for code linting
+- PostCSS for CSS processing
+- TypeScript for type safety
+- Git for version control
+
+File Size Summary:
+- Total source code: ~150KB
+- Largest component: JoinSection.tsx (42KB)
+- Largest page: SignUp.tsx (28KB)
+- Dashboard: Dashboard.tsx (24KB)
+- Email templates: ~40KB total
+
+This is a comprehensive club management web application with modern architecture and full-stack functionality. 
