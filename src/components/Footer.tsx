@@ -204,7 +204,7 @@ export const Footer = () => {
           <div className="text-white/60 text-xs md:text-sm space-y-1">
             <p>© {currentYear} Stellixor Technologies. All rights reserved.</p>
             <p className="flex items-center justify-center space-x-2">
-              <span>Liberate Club Management System</span>
+              <span>NIBM VibeCorner Club Management System</span>
               <span className="text-mustard-500">✨</span>
               <span>NIBM</span>
             </p>

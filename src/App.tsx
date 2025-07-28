@@ -7,7 +7,7 @@ import { GallerySection } from './components/GallerySection';
 import { JoinSection } from './components/JoinSection';
 import { SignIn } from './screen/SignIn';
 import { SignUp } from './screen/SignUp';
-import  Dashboard from './screen/dashboard/Dashboard';
+import  Dashboard from './screen/Dashboard';
 import { Footer } from './components/Footer';
 import { MusicToggle } from './components/MusicToggle';
 import { WhatsAppButton } from './components/WhatsAppButton';

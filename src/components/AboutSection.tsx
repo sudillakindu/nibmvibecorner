@@ -79,7 +79,7 @@ export const AboutSection = () => {
             </h2>
             
             <p className="text-charcoal-500 dark:text-cream-500 mb-6 md:mb-8 text-base md:text-lg">
-              Liberate was founded with a simple mission: to provide university
+              <strong>NIBM VibeCorner</strong> was founded with a simple mission: to provide university
               students with a safe space to express themselves, relieve stress,
               and find mental freedom through creative outlets like music,
               drama, and social activities.

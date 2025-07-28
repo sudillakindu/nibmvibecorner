@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Headphones, TrendingUp, Building2, FileText, Grid3X3, Settings, MapPin, Bell, BarChart3, User, ArrowUp, ArrowDown, Music, Calendar, Award, UserCheck, Image, Crown, ArrowLeft, Plus, MicIcon, Palette, Heart, Users } from 'lucide-react';
 import { ref, push } from 'firebase/database';
-import { database } from '../../firebase/firebase';
+import { database } from '../firebase/firebase';
 
 interface EventFormData {
     eventId: string;

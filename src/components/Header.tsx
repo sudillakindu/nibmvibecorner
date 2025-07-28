@@ -84,9 +84,9 @@ export const Header = ({
             onClick={() => window.location.reload()}
           >
             <span className={`${scrolled ? 'text-mustard-500' : 'text-mustard-500'}`}>
-              Libe
+              Vibe
             </span>
-            rate            
+            Corner            
           </h1>
         </div>
 

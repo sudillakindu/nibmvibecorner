@@ -44,10 +44,10 @@ export const HeroSection = () => {
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
       }`}>
         <div className="relative inline-block mb-6 md:mb-6">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white break-words">
-            <span className="text-gradient-mustard font-serif">Libe</span>rate
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white break-words">
+            <span className="text-gradient-mustard font-serif">Vibe</span>Corner
           </h1>
-          <div className="absolute -bottom-6 -right-2 md:-bottom-7 md:-right-4 w-8 h-8 md:w-12 md:h-12 text-xl md:text-3xl animate-float">
+          <div className="absolute -bottom-7 -right-5 md:-bottom-7 md:-right-7 w-8 h-8 md:w-12 md:h-12 text-xl md:text-3xl animate-float">
             ✨
           </div>
           <div className="absolute -top-3 -left-2 md:-top-4 md:-left-4 w-8 h-8 md:w-12 md:h-12 text-xl md:text-3xl animate-float-delay">
