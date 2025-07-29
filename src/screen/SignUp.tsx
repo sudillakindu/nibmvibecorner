@@ -12,7 +12,10 @@ export const SignUp = () => {
         email: '',
         phone: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        year: '',
+        faculty: '',
+        linkedin: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -29,7 +32,7 @@ export const SignUp = () => {
         message: ''
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
         // Special handling for studentIndexId field
@@ -97,6 +100,14 @@ export const SignUp = () => {
             newErrors.phone = 'Please enter a valid phone number';
         }
 
+        if (!formData.faculty) {
+            newErrors.faculty = 'Please select your faculty of study';
+        }
+
+        if (!formData.year) {
+            newErrors.year = 'Please select your year of study';
+        }
+
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 6) {
@@ -131,7 +142,7 @@ export const SignUp = () => {
             const data = await response.json();
             return data.ip;
         } catch (error) {
-            console.error('Error fetching IP:', error);
+            // console.error('Error fetching IP:', error);
             return 'unknown';
         }
     };
@@ -188,6 +199,9 @@ export const SignUp = () => {
                 email: formData.email.toLowerCase().trim(),
                 phone: formData.phone.trim(),
                 password: formData.password, // In real app, this should be hashed
+                faculty: formData.faculty,
+                year: formData.year,
+                linkedin: formData.linkedin.trim(),
                 lastLogin: currentTime,
                 lastLoginIp: clientIP,
                 isEmailVerified: false,
@@ -208,6 +222,9 @@ export const SignUp = () => {
                         email: formData.email.toLowerCase().trim(),
                         studentIndexId: formData.studentIndexId.trim(),
                         phone: formData.phone.trim(),
+                        faculty: formData.faculty,
+                        year: formData.year,
+                        linkedin: formData.linkedin.trim(),
                         role: newUser.role,
                         status: newUser.status,
                         lastLogin: newUser.lastLogin,
@@ -224,7 +241,7 @@ export const SignUp = () => {
                         showToast('success', 'Account created successfully! Welcome to NIBM VibeCorner Club! (Email notification failed)');
                     }
                 } catch (emailError) {
-                    console.error('Error sending confirmation email:', emailError);
+                    // console.error('Error sending confirmation email:', emailError);
                     showToast('success', 'Account created successfully! Welcome to NIBM VibeCorner Club! (Email notification failed)');
                 }
 
@@ -243,7 +260,7 @@ export const SignUp = () => {
             }
 
         } catch (error) {
-            console.error('Sign up error:', error);
+            // console.error('Sign up error:', error);
             showToast('error', 'An error occurred while creating your account. Please try again.');
         } finally {
             setIsLoading(false);
@@ -317,7 +334,7 @@ export const SignUp = () => {
                                     value={formData.studentIndexId}
                                     onChange={handleChange}
                                     required
-                                    placeholder="Enter your NIBM student ID (e.g : MADSE241F-001)"
+                                    placeholder="Enter your NIBM student ID"
                                     pattern="[A-Z0-9\s-]+"
                                     title="Only capital letters, numbers, spaces, and dashes are allowed"
                                     className={`w-full pl-10 pr-4 py-2 rounded-xl text-base font-normal transition-all duration-300
@@ -389,6 +406,104 @@ export const SignUp = () => {
                             </div>
                             {errors.phone && (
                                 <p className="text-red-500 text-xs">{errors.phone}</p>
+                            )}
+                        </div>
+
+                        {/* Faculty Field */}
+                        <div className="space-y-1">
+                            <label htmlFor="faculty" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                Faculty
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black dark:text-white text-base">🎓</span>
+                                <select
+                                    id="faculty"
+                                    name="faculty"
+                                    value={formData.faculty}
+                                    onChange={handleChange}
+                                    required
+                                    className={`appearance-none w-full pl-10 pr-4 py-2 rounded-xl text-base font-normal transition-all duration-300
+                            bg-white/80 dark:bg-charcoal-800/80
+                            border-2 ${errors.faculty ? 'border-red-500' : 'border-chocolate-400 dark:border-saddle-600'}
+                            text-charcoal-800 dark:text-white
+                            focus:outline-none focus:ring-0
+                            focus:border-yellow-500 dark:focus:border-yellow-400`}
+                                >
+                                    <option value="">Select Faculty of Study</option>
+                                    <option value="School of Business">School of Business</option>
+                                    <option value="School of Computing">School of Computing</option>
+                                    <option value="School of Engineering">School of Engineering</option>
+                                    <option value="School of Language">School of Language</option>
+                                    <option value="School of Design">School of Design</option>
+                                    <option value="School of Humanities">School of Humanities</option>
+                                    <option value="Business Analytics Center">Business Analytics Center</option>
+                                    <option value="Productivity & Quality Center">Productivity & Quality Center</option>
+                                </select>
+                            </div>
+                            {errors.faculty && (
+                                <p className="text-red-500 text-xs">{errors.faculty}</p>
+                            )}
+                        </div>
+
+                        {/* Year Field */}
+                        <div className="space-y-1">
+                            <label htmlFor="year" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                Year of Study
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black dark:text-white text-base">📅</span>
+                                <select
+                                    id="year"
+                                    name="year"
+                                    value={formData.year}
+                                    onChange={handleChange}
+                                    required
+                                    className={`appearance-none w-full pl-10 pr-4 py-2 rounded-xl text-base font-normal transition-all duration-300
+                            bg-white/80 dark:bg-charcoal-800/80
+                            border-2 ${errors.year ? 'border-red-500' : 'border-chocolate-400 dark:border-saddle-600'}
+                            text-charcoal-800 dark:text-white
+                            focus:outline-none focus:ring-0
+                            focus:border-yellow-500 dark:focus:border-yellow-400`}
+                                >
+                                    <option value="">Select Year of Study</option>
+                                    <option value="First Year">First Year</option>
+                                    <option value="Second Year">Second Year</option>
+                                    <option value="Third Year">Third Year</option>
+                                    <option value="Fourth Year">Fourth Year</option>
+                                    <option value="Certificate Programme">Certificate Programme</option>
+                                    <option value="Foundation Programme">Foundation Programme</option>
+                                </select>
+                            </div>
+                            {errors.year && (
+                                <p className="text-red-500 text-xs">{errors.year}</p>
+                            )}
+                        </div>
+
+                        {/* LinkedIn Field */}
+                        <div className="space-y-1">
+                            <label htmlFor="linkedin" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                LinkedIn Profile (Optional)
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black dark:text-white text-base">💼</span>
+                                <input
+                                    type="url"
+                                    id="linkedin"
+                                    name="linkedin"
+                                    value={formData.linkedin}
+                                    onChange={handleChange}
+                                    placeholder="Enter your LinkedIn profile URL"
+                                    className={`w-full pl-10 pr-4 py-2 rounded-xl text-base font-normal transition-all duration-300
+                            bg-white/80 dark:bg-charcoal-800/80
+                            border-2 ${errors.linkedin ? 'border-red-500' : 'border-chocolate-400 dark:border-saddle-600'}
+                            placeholder-charcoal-400 dark:placeholder-cream-600
+                            text-charcoal-800 dark:text-white
+                            focus:outline-none focus:ring-0
+                            focus:border-yellow-500 dark:focus:border-yellow-400`}
+                                />
+                            </div>
+                            {errors.linkedin && (
+                                <p className="text-red-500 text-xs">{errors.linkedin}</p>
                             )}
                         </div>
 

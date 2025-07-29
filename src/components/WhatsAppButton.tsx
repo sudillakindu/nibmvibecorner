@@ -19,7 +19,7 @@ export const WhatsAppButton = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching WhatsApp community link:', error);
+        // console.error('Error fetching WhatsApp community link:', error);
         // Continue with default link if Firebase fails
       }
     };

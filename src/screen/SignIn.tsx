@@ -102,13 +102,24 @@ export const SignIn = () => {
 
             showToast('success', 'Welcome back! Sign in successful');
 
-            // Redirect to home page after a short delay
-            // setTimeout(() => {
-            //     window.location.href = '/';
-            // }, 1500);
+            // Redirect based on user role
+            const userRole = userData.role?.toLowerCase();
+            const adminRoles = ['president', 'student_coordinator', 'social_media_manager'];
+            
+            if (adminRoles.includes(userRole)) {
+                // Admin users go to dashboard
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } else {
+                // Regular users go to home page
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            }
 
         } catch (error) {
-            console.error('Sign in error:', error);
+            // console.error('Sign in error:', error);
             showToast('error', 'An error occurred. Please try again');
         } finally {
             setIsLoading(false);

@@ -24,10 +24,10 @@ export const MusicToggle = () => {
           audioRef.current.loop = true;
           audioRef.current.volume = 0.5; // Set volume to 50%
         } else {
-          console.log('No music URL found in database');
+          // console.log('No music URL found in database');
         }
       } catch (error) {
-        console.error('Error fetching music URL:', error);
+        // console.error('Error fetching music URL:', error);
       } finally {
         setIsLoading(false);
       }
@@ -51,7 +51,7 @@ export const MusicToggle = () => {
       setIsPlaying(false);
     } else {
       audioRef.current.play().catch(error => {
-        console.error('Audio playback failed:', error);
+        // console.error('Audio playback failed:', error);
         setIsPlaying(false);
       });
       setIsPlaying(true);

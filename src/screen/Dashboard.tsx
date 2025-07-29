@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Headphones, TrendingUp, Building2, FileText, Grid3X3, Settings, MapPin, Bell, BarChart3, User, ArrowUp, ArrowDown, Music, Calendar, Award, UserCheck, Image, Crown, ArrowLeft, Plus, MicIcon, Palette, Heart, Users, CheckIcon } from 'lucide-react';
-import { ref, push } from 'firebase/database';
+import { Search, Headphones, TrendingUp, Building2, FileText, Grid3X3, Settings, MapPin, Bell, BarChart3, User, ArrowUp, ArrowDown, Music, Calendar, Award, UserCheck, Image, Crown, ArrowLeft, Plus, MicIcon, Palette, Heart, Users, CheckIcon, FileText as FileTextIcon, Mail, Phone, MapPin as MapPinIcon, Clock, Eye, Edit, Trash2 } from 'lucide-react';
+import { ref, push, get, onValue, set } from 'firebase/database';
 import { database } from '../firebase/firebase';
+import { uploadImageToImgBB, validateImageFile } from '../services/imageUploadService';
 
 interface EventFormData {
     eventId: string;
@@ -21,6 +22,37 @@ interface EventFormData {
     status: string;
     isActive: boolean;
     createdAt: string;
+}
+
+interface User {
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    role: string;
+    status: string;
+    studentIndexId: string;
+    year: string;
+    faculty: string;
+    profilePicture?: string;
+    linkedin?: string;
+    createdAt: string;
+    lastLogin: string;
+    isEmailVerified: boolean;
+}
+
+interface Application {
+    id: string;
+    name: string;
+    email: string;
+    studentIndexId: string;
+    faculty: string;
+    year: string;
+    interests: string[];
+    message?: string;
+    status: string;
+    timestamp: string;
+    isEmailSend: boolean;
 }
 
 const eventTypes = [
@@ -51,6 +83,23 @@ const Dashboard: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [selectedTimeframe, setSelectedTimeframe] = useState('2024');
     const [loading, setLoading] = useState(false);
+    const [users, setUsers] = useState<User[]>([]);
+    const [applications, setApplications] = useState<Application[]>([]);
+    const [loadingUsers, setLoadingUsers] = useState(false);
+    const [loadingApplications, setLoadingApplications] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    
+    // Modal states
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<User | Application | null>(null);
+    const [modalType, setModalType] = useState<'user' | 'application'>('user');
+    const [editFormData, setEditFormData] = useState<any>({});
+    const [saving, setSaving] = useState(false);
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    
     const [formData, setFormData] = useState<EventFormData>({
         eventId: '',
         eventName: '',
@@ -71,9 +120,102 @@ const Dashboard: React.FC = () => {
         createdAt: ''
     });
 
+    // Check authorization on component mount
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        if (!user) {
+            window.location.href = '/signin';
+            return;
+        }
+
+        const userData = JSON.parse(user);
+        const userRole = userData.role?.toLowerCase();
+        const adminRoles = ['president', 'student_coordinator', 'social_media_manager'];
+        
+        if (!adminRoles.includes(userRole)) {
+            window.location.href = '/';
+            return;
+        }
+
+        setCurrentUser(userData);
+    }, []);
+
+    // Logout function
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    };
+
     useEffect(() => {
         setIsVisible(true);
+        fetchUsers();
+        fetchApplications();
     }, []);
+
+    const fetchUsers = async () => {
+        setLoadingUsers(true);
+        try {
+            const usersRef = ref(database, 'users');
+            const snapshot = await get(usersRef);
+            
+            if (snapshot.exists()) {
+                const usersData = snapshot.val();
+                const usersArray: User[] = Object.keys(usersData).map(key => ({
+                    id: key,
+                    ...usersData[key]
+                }));
+                setUsers(usersArray);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
+
+    const fetchApplications = async () => {
+        setLoadingApplications(true);
+        try {
+            const applicationsRef = ref(database, 'applications');
+            const snapshot = await get(applicationsRef);
+            
+            if (snapshot.exists()) {
+                const applicationsData = snapshot.val();
+                const applicationsArray: Application[] = Object.keys(applicationsData).map(key => ({
+                    id: key,
+                    ...applicationsData[key]
+                }));
+                setApplications(applicationsArray);
+            }
+        } catch (error) {
+            console.error('Error fetching applications:', error);
+        } finally {
+            setLoadingApplications(false);
+        }
+    };
+
+    // Filter users based on role
+    const generalMembers = users.filter(user => user.role === 'member');
+    const executiveMembers = users.filter(user => user.role !== 'member' && user.role !== undefined);
+
+    // Filter data based on search term
+    const filteredGeneralMembers = generalMembers.filter(user =>
+        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.studentIndexId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredExecutiveMembers = executiveMembers.filter(user =>
+        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.studentIndexId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredApplications = applications.filter(app =>
+        app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        app.studentIndexId.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -128,7 +270,7 @@ const Dashboard: React.FC = () => {
                 createdAt: ''
             });
         } catch (error) {
-            console.error('Error adding event:', error);
+            // console.error('Error adding event:', error);
             alert('Error adding event. Please try again.');
         } finally {
             setLoading(false);
@@ -138,8 +280,9 @@ const Dashboard: React.FC = () => {
     // Updated Navigation with your specific requirements
     const mainNavItems = [
         { id: 'dashboard', icon: Grid3X3, label: 'Dashboard', count: 0 },
-        { id: 'executive', icon: Crown, label: 'Executive Member', count: 8 },
-        { id: 'general', icon: UserCheck, label: 'General Member', count: 1247 },
+        { id: 'executive', icon: Crown, label: 'Executive Member', count: executiveMembers.length },
+        { id: 'general', icon: UserCheck, label: 'General Member', count: generalMembers.length },
+        { id: 'application', icon: FileTextIcon, label: 'Application', count: applications.length },
         { id: 'event', icon: Calendar, label: 'Event', count: 15 },
         { id: 'gallery', icon: Image, label: 'Gallery', count: 23 },
         { id: 'settings', icon: Settings, label: 'Settings', count: 3 },
@@ -149,52 +292,52 @@ const Dashboard: React.FC = () => {
         {
             title: 'Total Members',
             subtitle: 'Active Members',
-            value: '1,247',
-            usage: '85%',
-            remaining: '15%',
+            value: users.length.toString(),
+            usage: `${Math.round((users.filter(u => u.status === 'active').length / users.length) * 100) || 0}%`,
+            remaining: `${Math.round((users.filter(u => u.status !== 'active').length / users.length) * 100) || 0}%`,
             icon: UserCheck,
             color: 'chocolate',
-            progress: 85,
-            change: '+12.5%',
+            progress: Math.round((users.filter(u => u.status === 'active').length / users.length) * 100) || 0,
+            change: `+${generalMembers.length}`,
             trend: 'up',
             details: {
-                newThisMonth: 45,
-                activeToday: 89,
-                totalRegistrations: 1567
+                newThisMonth: generalMembers.length,
+                activeToday: users.filter(u => u.status === 'active').length,
+                totalRegistrations: users.length
             }
         },
         {
-            title: 'Active Events',
-            subtitle: 'This Month',
-            value: '8',
-            usage: '75%',
-            remaining: '25%',
-            icon: Calendar,
+            title: 'Executive Members',
+            subtitle: 'Club Leadership',
+            value: executiveMembers.length.toString(),
+            usage: `${Math.round((executiveMembers.filter(u => u.status === 'active').length / executiveMembers.length) * 100) || 0}%`,
+            remaining: `${Math.round((executiveMembers.filter(u => u.status !== 'active').length / executiveMembers.length) * 100) || 0}%`,
+            icon: Crown,
             color: 'chocolate',
-            progress: 75,
-            change: '+3',
+            progress: Math.round((executiveMembers.filter(u => u.status === 'active').length / executiveMembers.length) * 100) || 0,
+            change: `+${executiveMembers.length}`,
             trend: 'up',
             details: {
-                upcoming: 5,
-                ongoing: 3,
-                completed: 12
+                upcoming: executiveMembers.length,
+                ongoing: executiveMembers.filter(u => u.status === 'active').length,
+                completed: executiveMembers.length
             }
         },
         {
-            title: 'Music Sessions',
-            subtitle: 'Completed',
-            value: '24',
-            usage: '60%',
-            remaining: '40%',
-            icon: Music,
+            title: 'Applications',
+            subtitle: 'Pending Review',
+            value: applications.length.toString(),
+            usage: `${Math.round((applications.filter(a => a.status === 'pending').length / applications.length) * 100) || 0}%`,
+            remaining: `${Math.round((applications.filter(a => a.status !== 'pending').length / applications.length) * 100) || 0}%`,
+            icon: FileTextIcon,
             color: 'chocolate',
-            progress: 60,
-            change: '+8.2%',
+            progress: Math.round((applications.filter(a => a.status === 'pending').length / applications.length) * 100) || 0,
+            change: `+${applications.filter(a => a.status === 'pending').length}`,
             trend: 'up',
             details: {
-                thisWeek: 3,
-                thisMonth: 8,
-                totalSessions: 156
+                thisWeek: applications.filter(a => new Date(a.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length,
+                thisMonth: applications.filter(a => new Date(a.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length,
+                totalSessions: applications.length
             }
         }
     ];
@@ -205,11 +348,190 @@ const Dashboard: React.FC = () => {
         { month: 'October', value: '145', trend: 'down', newMembers: 18, events: 3 }
     ];
 
-    const recentMembers: any[] = [];
+    const recentMembers = users
+        .sort((a, b) => new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime())
+        .slice(0, 5)
+        .map(user => ({
+            id: user.id,
+            name: user.fullName,
+            faculty: user.faculty,
+            year: user.year,
+            status: user.status,
+            avatar: user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()
+        }));
 
     const upcomingEvents: any[] = [];
 
-    const recentActivities: any[] = [];
+    const recentActivities = [
+        ...applications.slice(0, 3).map(app => ({
+            id: app.id,
+            title: `New application from ${app.name}`,
+            description: `Applied for ${app.interests.join(', ')}`,
+            timestamp: new Date(app.timestamp).toLocaleDateString(),
+            icon: FileTextIcon,
+            color: 'mustard'
+        })),
+        ...users.slice(0, 2).map(user => ({
+            id: user.id,
+            title: `${user.fullName} joined the club`,
+            description: `${user.role} - ${user.faculty}`,
+            timestamp: new Date(user.createdAt).toLocaleDateString(),
+            icon: UserCheck,
+            color: 'chocolate'
+        }))
+    ];
+
+    // View and Edit functions
+    const handleView = (item: User | Application, type: 'user' | 'application') => {
+        setSelectedItem(item);
+        setModalType(type);
+        setShowViewModal(true);
+    };
+
+    const handleEdit = (item: User | Application, type: 'user' | 'application') => {
+        setSelectedItem(item);
+        setModalType(type);
+        setEditFormData({ ...item });
+        
+        // Set image preview if editing a user with profile picture
+        if (type === 'user' && (item as User).profilePicture) {
+            setImagePreview((item as User).profilePicture || null);
+        } else {
+            setImagePreview(null);
+        }
+        
+        setProfileImage(null);
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = async () => {
+        if (!selectedItem) return;
+        
+        setSaving(true);
+        try {
+            const path = modalType === 'user' ? 'users' : 'applications';
+            const itemRef = ref(database, `${path}/${selectedItem.id}`);
+            
+            let updatedData = { ...editFormData };
+            
+            // Handle profile image upload for users
+            if (modalType === 'user' && profileImage) {
+                try {
+                    // Upload image to ImgBB with user's name
+                    const userName = editFormData.fullName || (selectedItem as User).fullName;
+                    const imageUrl = await uploadImageToImgBB(profileImage, userName);
+                    updatedData.profilePicture = imageUrl;
+                    
+                    // Update the item in Firebase
+                    await set(itemRef, updatedData);
+                    
+                    // Update local state
+                    setUsers((prev: User[]) => prev.map(user => 
+                        user.id === selectedItem.id ? { ...user, ...updatedData } : user
+                    ));
+                    
+                    setShowEditModal(false);
+                    setSelectedItem(null);
+                    setEditFormData({});
+                    setProfileImage(null);
+                    setImagePreview(null);
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    alert('Failed to upload image. Please try again.');
+                    return;
+                }
+                return;
+            }
+            
+            // Update the item in Firebase
+            await set(itemRef, updatedData);
+            
+            // Update local state
+            if (modalType === 'user') {
+                setUsers((prev: User[]) => prev.map(user => 
+                    user.id === selectedItem.id ? { ...user, ...updatedData } : user
+                ));
+            } else {
+                setApplications((prev: Application[]) => prev.map(app => 
+                    app.id === selectedItem.id ? { ...app, ...updatedData } : app
+                ));
+            }
+            
+            setShowEditModal(false);
+            setSelectedItem(null);
+            setEditFormData({});
+            setProfileImage(null);
+            setImagePreview(null);
+        } catch (error) {
+            console.error('Error updating item:', error);
+            alert('Error updating item. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleInputChangeEdit = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        const checked = (e.target as HTMLInputElement).checked;
+
+        setEditFormData((prev: any) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const closeModals = () => {
+        setShowViewModal(false);
+        setShowEditModal(false);
+        setSelectedItem(null);
+        setEditFormData({});
+        setProfileImage(null);
+        setImagePreview(null);
+    };
+
+    // Profile image handling functions
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file using the service
+            const validation = validateImageFile(file);
+            if (!validation.isValid) {
+                alert(validation.error);
+                return;
+            }
+            
+            setProfileImage(file);
+            
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreview(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setProfileImage(null);
+        setImagePreview(null);
+        // Clear the file input
+        const fileInput = document.getElementById('profile-image-input') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    };
+
+    // Show loading while checking authorization
+    if (!currentUser) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-cream-50 via-sand-50 to-chocolate-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-mustard-500 mx-auto mb-4"></div>
+                    <p className="text-chocolate-600">Loading dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-cream-50 via-sand-50 to-chocolate-50">
@@ -227,6 +549,23 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* User Info and Logout */}
+                    {currentUser && (
+                        <div className="flex flex-col items-center space-y-4 w-full px-4">
+                            <div className="text-center">
+                                <p className="text-white text-sm font-medium">{currentUser.fullName}</p>
+                                <p className="text-cream-300 text-xs capitalize">{currentUser.role?.replace('_', ' ')}</p>
+                            </div>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                            >
+                                <span>🚪</span>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    )}
+
                     {/* Navigation - Updated with your specific menu items */}
                     <nav className="flex flex-col space-y-6 w-full px-4">
                         {mainNavItems.map((item) => {
@@ -234,7 +573,10 @@ const Dashboard: React.FC = () => {
                             return (
                                 <button
                                     key={item.id}
-                                    onClick={() => setActiveNav(item.id)}
+                                    onClick={() => {
+                                        setActiveNav(item.id);
+                                        setSearchTerm(''); // Clear search when switching tabs
+                                    }}
                                     className={`relative w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeNav === item.id
                                             ? 'bg-mustard-500 text-white shadow-lg'
                                             : 'text-white hover:bg-mustard-500/20 hover:text-mustard-300'
@@ -694,9 +1036,128 @@ const Dashboard: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-cream-200">
-                                <h2 className="text-xl font-semibold text-chocolate-700 mb-4">Executive Member Management</h2>
-                                <p className="text-chocolate-600">Executive member management functionality will be implemented here.</p>
+                            {/* Search Bar */}
+                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-cream-200 mb-6">
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chocolate-400 w-5 h-5" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search executive members..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-mustard-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={fetchUsers}
+                                        className="px-4 py-2 bg-mustard-500 text-white rounded-xl hover:bg-mustard-600 transition-colors"
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Executive Members List */}
+                            <div className="bg-white rounded-2xl shadow-lg border border-cream-200">
+                                <div className="p-6 border-b border-cream-200">
+                                    <h2 className="text-xl font-semibold text-chocolate-700">Executive Members ({filteredExecutiveMembers.length})</h2>
+                                </div>
+                                {loadingUsers ? (
+                                    <div className="p-8 text-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mustard-500 mx-auto"></div>
+                                        <p className="text-chocolate-600 mt-2">Loading executive members...</p>
+                                    </div>
+                                ) : filteredExecutiveMembers.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <User className="w-12 h-12 text-chocolate-400 mx-auto mb-4" />
+                                        <p className="text-chocolate-600">No executive members found</p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-cream-200">
+                                        {filteredExecutiveMembers.map((user) => (
+                                            <div key={user.id} className="p-6 hover:bg-cream-50 transition-colors">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="w-12 h-12 bg-gradient-to-r from-mustard-400 to-orange-400 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden">
+                                                            <img 
+                                                                src={user.profilePicture || '/image/profile.png'} 
+                                                                alt={user.fullName}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.style.display = 'none';
+                                                                    const nextElement = target.nextElementSibling as HTMLElement;
+                                                                    if (nextElement) {
+                                                                        nextElement.classList.remove('hidden');
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <span className="hidden">
+                                                                {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-semibold text-chocolate-700">{user.fullName}</h3>
+                                                            <p className="text-sm text-chocolate-500">{user.role}</p>
+                                                            <div className="flex items-center space-x-4 mt-1">
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <Mail className="w-3 h-3 mr-1" />
+                                                                    {user.email}
+                                                                </span>
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <FileTextIcon className="w-3 h-3 mr-1" />
+                                                                    {user.studentIndexId}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                            user.status === 'active' 
+                                                                ? 'bg-green-100 text-green-700' 
+                                                                : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {user.status}
+                                                        </div>
+                                                        <div className="flex space-x-1">
+                                                            <button 
+                                                                onClick={() => handleView(user, 'user')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleEdit(user, 'user')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                                    <div>
+                                                        <span className="text-chocolate-500">Faculty:</span>
+                                                        <p className="text-chocolate-700">{user.faculty}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Year:</span>
+                                                        <p className="text-chocolate-700">{user.year}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Phone:</span>
+                                                        <p className="text-chocolate-700">{user.phone}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Last Login:</span>
+                                                        <p className="text-chocolate-700">{new Date(user.lastLogin).toLocaleDateString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </>
                     ) : activeNav === 'general' ? (
@@ -724,9 +1185,270 @@ const Dashboard: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-cream-200">
-                                <h2 className="text-xl font-semibold text-chocolate-700 mb-4">General Member Management</h2>
-                                <p className="text-chocolate-600">General member management functionality will be implemented here.</p>
+                            {/* Search Bar */}
+                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-cream-200 mb-6">
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chocolate-400 w-5 h-5" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search general members..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-mustard-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={fetchUsers}
+                                        className="px-4 py-2 bg-mustard-500 text-white rounded-xl hover:bg-mustard-600 transition-colors"
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* General Members List */}
+                            <div className="bg-white rounded-2xl shadow-lg border border-cream-200">
+                                <div className="p-6 border-b border-cream-200">
+                                    <h2 className="text-xl font-semibold text-chocolate-700">General Members ({filteredGeneralMembers.length})</h2>
+                                </div>
+                                {loadingUsers ? (
+                                    <div className="p-8 text-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mustard-500 mx-auto"></div>
+                                        <p className="text-chocolate-600 mt-2">Loading general members...</p>
+                                    </div>
+                                ) : filteredGeneralMembers.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <UserCheck className="w-12 h-12 text-chocolate-400 mx-auto mb-4" />
+                                        <p className="text-chocolate-600">No general members found</p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-cream-200">
+                                        {filteredGeneralMembers.map((user) => (
+                                            <div key={user.id} className="p-6 hover:bg-cream-50 transition-colors">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="w-12 h-12 bg-gradient-to-r from-mustard-400 to-orange-400 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden">
+                                                            <img 
+                                                                src={user.profilePicture || '/image/profile.png'} 
+                                                                alt={user.fullName}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.style.display = 'none';
+                                                                    const nextElement = target.nextElementSibling as HTMLElement;
+                                                                    if (nextElement) {
+                                                                        nextElement.classList.remove('hidden');
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <span className="hidden">
+                                                                {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-semibold text-chocolate-700">{user.fullName}</h3>
+                                                            <p className="text-sm text-chocolate-500">General Member</p>
+                                                            <div className="flex items-center space-x-4 mt-1">
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <Mail className="w-3 h-3 mr-1" />
+                                                                    {user.email}
+                                                                </span>
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <FileTextIcon className="w-3 h-3 mr-1" />
+                                                                    {user.studentIndexId}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                            user.status === 'active' 
+                                                                ? 'bg-green-100 text-green-700' 
+                                                                : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {user.status}
+                                                        </div>
+                                                        <div className="flex space-x-1">
+                                                            <button 
+                                                                onClick={() => handleView(user, 'user')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleEdit(user, 'user')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                                    <div>
+                                                        <span className="text-chocolate-500">Faculty:</span>
+                                                        <p className="text-chocolate-700">{user.faculty}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Year:</span>
+                                                        <p className="text-chocolate-700">{user.year}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Phone:</span>
+                                                        <p className="text-chocolate-700">{user.phone}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Last Login:</span>
+                                                        <p className="text-chocolate-700">{new Date(user.lastLogin).toLocaleDateString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    ) : activeNav === 'application' ? (
+                        <>
+                            {/* Header */}
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gradient-mustard">Applications</h1>
+                                    <p className="text-chocolate-600 mt-1">View and manage club applications</p>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <button className="relative p-2 text-chocolate-600 hover:text-mustard-600 transition-colors">
+                                        <Bell className="w-5 h-5" />
+                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full"></span>
+                                    </button>
+                                    <button className="p-2 text-chocolate-600 hover:text-mustard-600 transition-colors">
+                                        <BarChart3 className="w-5 h-5" />
+                                    </button>
+                                    <div className="flex items-center space-x-2 bg-white rounded-full px-4 py-2 shadow-sm">
+                                        <div className="w-8 h-8 bg-gradient-to-r from-mustard-400 to-orange-400 rounded-full flex items-center justify-center">
+                                            <User className="w-4 h-4 text-white" />
+                                        </div>
+                                        <span className="text-sm font-medium text-chocolate-700">Olga Tomarashvill</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Search Bar */}
+                            <div className="bg-white rounded-2xl p-6 shadow-lg border border-cream-200 mb-6">
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex-1 relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-chocolate-400 w-5 h-5" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search applications..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-mustard-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={fetchApplications}
+                                        className="px-4 py-2 bg-mustard-500 text-white rounded-xl hover:bg-mustard-600 transition-colors"
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Applications List */}
+                            <div className="bg-white rounded-2xl shadow-lg border border-cream-200">
+                                <div className="p-6 border-b border-cream-200">
+                                    <h2 className="text-xl font-semibold text-chocolate-700">Applications ({filteredApplications.length})</h2>
+                                </div>
+                                {loadingApplications ? (
+                                    <div className="p-8 text-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-mustard-500 mx-auto"></div>
+                                        <p className="text-chocolate-600 mt-2">Loading applications...</p>
+                                    </div>
+                                ) : filteredApplications.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <FileTextIcon className="w-12 h-12 text-chocolate-400 mx-auto mb-4" />
+                                        <p className="text-chocolate-600">No applications found</p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-cream-200">
+                                        {filteredApplications.map((app) => (
+                                            <div key={app.id} className="p-6 hover:bg-cream-50 transition-colors">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className="w-12 h-12 bg-gradient-to-r from-mustard-400 to-orange-400 rounded-full flex items-center justify-center text-white font-semibold">
+                                                            {app.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-semibold text-chocolate-700">{app.name}</h3>
+                                                            <p className="text-sm text-chocolate-500">Application</p>
+                                                            <div className="flex items-center space-x-4 mt-1">
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <Mail className="w-3 h-3 mr-1" />
+                                                                    {app.email}
+                                                                </span>
+                                                                <span className="flex items-center text-xs text-chocolate-400">
+                                                                    <FileTextIcon className="w-3 h-3 mr-1" />
+                                                                    {app.studentIndexId}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                            app.status === 'pending' 
+                                                                ? 'bg-yellow-100 text-yellow-700'
+                                                                : app.status === 'approved'
+                                                                ? 'bg-green-100 text-green-700'
+                                                                : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {app.status}
+                                                        </div>
+                                                        <div className="flex space-x-1">
+                                                            <button 
+                                                                onClick={() => handleView(app, 'application')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleEdit(app, 'application')}
+                                                                className="p-2 text-chocolate-400 hover:text-mustard-600 transition-colors"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                                    <div>
+                                                        <span className="text-chocolate-500">Faculty:</span>
+                                                        <p className="text-chocolate-700">{app.faculty}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Year:</span>
+                                                        <p className="text-chocolate-700">{app.year}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Interests:</span>
+                                                        <p className="text-chocolate-700">{app.interests.join(', ')}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-chocolate-500">Applied:</span>
+                                                        <p className="text-chocolate-700">{new Date(app.timestamp).toLocaleDateString()}</p>
+                                                    </div>
+                                                </div>
+                                                {app.message && (
+                                                    <div className="mt-3 p-3 bg-cream-50 rounded-lg">
+                                                        <span className="text-chocolate-500 text-sm">Message:</span>
+                                                        <p className="text-chocolate-700 text-sm mt-1">{app.message}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </>
                     ) : activeNav === 'gallery' ? (
@@ -826,8 +1548,8 @@ const Dashboard: React.FC = () => {
                                             <p className="text-sm text-chocolate-500">{card.subtitle}</p>
                                         </div>
                                         <div className="relative">
-                                            <div className={`w-16 h-12 rounded-full bg-${card.color}-100 flex items-center justify-center`}>
-                                                <Icon className={`w-6 h-6 text-${card.color}-600`} />
+                                            <div className="w-16 h-12 rounded-full bg-chocolate-100 flex items-center justify-center">
+                                                <Icon className="w-6 h-6 text-chocolate-600" />
                                             </div>
                                         </div>
                                     </div>
@@ -1048,8 +1770,8 @@ const Dashboard: React.FC = () => {
                                     const Icon = activity.icon;
                                     return (
                                         <div key={activity.id} className="flex items-start space-x-3">
-                                            <div className={`w-8 h-8 rounded-full bg-${activity.color}-100 flex items-center justify-center flex-shrink-0`}>
-                                                <Icon className={`w-4 h-4 text-${activity.color}-600`} />
+                                            <div className="w-8 h-8 rounded-full bg-chocolate-100 flex items-center justify-center flex-shrink-0">
+                                                <Icon className="w-4 h-4 text-chocolate-600" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="font-medium text-chocolate-700 text-sm">{activity.title}</div>
@@ -1063,6 +1785,484 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
                         </>
+                    )}
+
+                    {/* View Modal */}
+                    {showViewModal && selectedItem && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="p-6 border-b border-cream-200">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-2xl font-bold text-chocolate-700">
+                                            {modalType === 'user' ? 'User Details' : 'Application Details'}
+                                        </h2>
+                                        <button
+                                            onClick={closeModals}
+                                            className="p-2 text-chocolate-400 hover:text-chocolate-600 transition-colors"
+                                        >
+                                            <span className="text-2xl">×</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-6">
+                                    {modalType === 'user' ? (
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Full Name</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).fullName}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).email}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Phone</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).phone}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Student ID</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).studentIndexId}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Role</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).role}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Status</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).status}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Faculty</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).faculty}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Year</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).year}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Created At</label>
+                                                    <p className="text-chocolate-800">{new Date((selectedItem as User).createdAt).toLocaleString()}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Last Login</label>
+                                                    <p className="text-chocolate-800">{new Date((selectedItem as User).lastLogin).toLocaleString()}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email Verified</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as User).isEmailVerified ? 'Yes' : 'No'}</p>
+                                                </div>
+                                                {(selectedItem as User).linkedin && (
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-chocolate-600 mb-1">LinkedIn</label>
+                                                        <p className="text-chocolate-800">{(selectedItem as User).linkedin}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Name</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).name}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).email}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Student ID</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).studentIndexId}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Status</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).status}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Faculty</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).faculty}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Year</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).year}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Interests</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).interests.join(', ')}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Applied Date</label>
+                                                    <p className="text-chocolate-800">{new Date((selectedItem as Application).timestamp).toLocaleString()}</p>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email Sent</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).isEmailSend ? 'Yes' : 'No'}</p>
+                                                </div>
+                                            </div>
+                                            {(selectedItem as Application).message && (
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Message</label>
+                                                    <p className="text-chocolate-800">{(selectedItem as Application).message}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Edit Modal */}
+                    {showEditModal && selectedItem && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="p-6 border-b border-cream-200">
+                                    <div className="flex items-center justify-between">
+                                        <h2 className="text-2xl font-bold text-chocolate-700">
+                                            Edit {modalType === 'user' ? 'User' : 'Application'}
+                                        </h2>
+                                        <button
+                                            onClick={closeModals}
+                                            className="p-2 text-chocolate-400 hover:text-chocolate-600 transition-colors"
+                                        >
+                                            <span className="text-2xl">×</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-6">
+                                    {modalType === 'user' ? (
+                                        <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }} className="space-y-4">
+                                            {/* Profile Image Upload Section */}
+                                            <div className="mb-6">
+                                                <label className="block text-sm font-semibold text-chocolate-600 mb-3">Profile Image</label>
+                                                <div className="flex items-center space-x-4">
+                                                    {/* Image Preview */}
+                                                    <div className="relative">
+                                                        <div className="w-20 h-20 rounded-full overflow-hidden bg-cream-100 border-2 border-cream-300 flex items-center justify-center">
+                                                            {imagePreview ? (
+                                                                <img 
+                                                                    src={imagePreview} 
+                                                                    alt="Profile Preview" 
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <img 
+                                                                    src="/image/profile.png" 
+                                                                    alt="Default Profile" 
+                                                                    className="w-full h-full object-cover"
+                                                                                                                                    onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.style.display = 'none';
+                                                                    const nextElement = target.nextElementSibling as HTMLElement;
+                                                                    if (nextElement) {
+                                                                        nextElement.style.display = 'block';
+                                                                    }
+                                                                }}
+                                                                />
+                                                            )}
+                                                            <User className="w-8 h-8 text-chocolate-400 hidden" />
+                                                        </div>
+                                                        {imagePreview && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={removeImage}
+                                                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Upload Button */}
+                                                    <div className="flex-1">
+                                                        <input
+                                                            type="file"
+                                                            id="profile-image-input"
+                                                            accept="image/*"
+                                                            onChange={handleImageChange}
+                                                            className="hidden"
+                                                        />
+                                                        <label
+                                                            htmlFor="profile-image-input"
+                                                            className="inline-flex items-center px-4 py-2 bg-mustard-500 text-white rounded-lg hover:bg-mustard-600 transition-colors cursor-pointer"
+                                                        >
+                                                            <Image className="w-4 h-4 mr-2" />
+                                                            {imagePreview ? 'Change Image' : 'Upload Image'}
+                                                        </label>
+                                                        <p className="text-xs text-chocolate-500 mt-1">
+                                                            Max size: 2MB. Supported formats: JPG, PNG, GIF, WebP
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Full Name</label>
+                                                    <input
+                                                        type="text"
+                                                        name="fullName"
+                                                        value={editFormData.fullName || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email</label>
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        value={editFormData.email || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Phone</label>
+                                                    <input
+                                                        type="text"
+                                                        name="phone"
+                                                        value={editFormData.phone || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Student ID</label>
+                                                    <input
+                                                        type="text"
+                                                        name="studentIndexId"
+                                                        value={editFormData.studentIndexId || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Role</label>
+                                                    <select
+                                                        name="role"
+                                                        value={editFormData.role || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="member">Member</option>
+                                                        <option value="president">President</option>
+                                                        <option value="vice_president">Vice President</option>
+                                                        <option value="student_coordinator">Student Coordinator</option>
+                                                        <option value="secretary">Secretary</option>
+                                                        <option value="assistant_secretary">Assistant Secretary</option>
+                                                        <option value="treasurer">Treasurer</option>
+                                                        <option value="social_media_manager">Social Media Manager</option>
+                                                        <option value="editor">Editor</option>
+                                                        <option value="committee_member">Committee Member</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Status</label>
+                                                    <select
+                                                        name="status"
+                                                        value={editFormData.status || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="active">Active</option>
+                                                        <option value="inactive">Inactive</option>
+                                                        <option value="suspended">Suspended</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Faculty</label>
+                                                    <select
+                                                        name="faculty"
+                                                        value={editFormData.faculty || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="">Select Faculty of Study</option>
+                                                        <option value="School of Business">School of Business</option>
+                                                        <option value="School of Computing">School of Computing</option>
+                                                        <option value="School of Engineering">School of Engineering</option>
+                                                        <option value="School of Language">School of Language</option>
+                                                        <option value="School of Design">School of Design</option>
+                                                        <option value="School of Humanities">School of Humanities</option>
+                                                        <option value="Business Analytics Center">Business Analytics Center</option>
+                                                        <option value="Productivity & Quality Center">Productivity & Quality Center</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Year</label>
+                                                    <select
+                                                        name="year"
+                                                        value={editFormData.year || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="">Select Year of Study</option>
+                                                        <option value="First Year">First Year</option>
+                                                        <option value="Second Year">Second Year</option>
+                                                        <option value="Third Year">Third Year</option>
+                                                        <option value="Fourth Year">Fourth Year</option>
+                                                        <option value="Certificate Programme">Certificate Programme</option>
+                                                        <option value="Foundation Programme">Foundation Programme</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">LinkedIn</label>
+                                                    <input
+                                                        type="url"
+                                                        name="linkedin"
+                                                        value={editFormData.linkedin || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-end space-x-3 pt-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={closeModals}
+                                                    className="px-4 py-2 text-chocolate-600 border border-cream-300 rounded-lg hover:bg-cream-50 transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    disabled={saving}
+                                                    className="px-4 py-2 bg-mustard-500 text-white rounded-lg hover:bg-mustard-600 disabled:opacity-50 transition-colors"
+                                                >
+                                                    {saving ? 'Saving...' : 'Save Changes'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }} className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Name</label>
+                                                    <input
+                                                        type="text"
+                                                        name="name"
+                                                        value={editFormData.name || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Email</label>
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        value={editFormData.email || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Student ID</label>
+                                                    <input
+                                                        type="text"
+                                                        name="studentIndexId"
+                                                        value={editFormData.studentIndexId || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Status</label>
+                                                    <select
+                                                        name="status"
+                                                        value={editFormData.status || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="pending">Pending</option>
+                                                        <option value="approved">Approved</option>
+                                                        <option value="rejected">Rejected</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Faculty</label>
+                                                    <select
+                                                        name="faculty"
+                                                        value={editFormData.faculty || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="">Select Faculty of Study</option>
+                                                        <option value="School of Business">School of Business</option>
+                                                        <option value="School of Computing">School of Computing</option>
+                                                        <option value="School of Engineering">School of Engineering</option>
+                                                        <option value="School of Language">School of Language</option>
+                                                        <option value="School of Design">School of Design</option>
+                                                        <option value="School of Humanities">School of Humanities</option>
+                                                        <option value="Business Analytics Center">Business Analytics Center</option>
+                                                        <option value="Productivity & Quality Center">Productivity & Quality Center</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-chocolate-600 mb-1">Year</label>
+                                                    <select
+                                                        name="year"
+                                                        value={editFormData.year || ''}
+                                                        onChange={handleInputChangeEdit}
+                                                        className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                    >
+                                                        <option value="">Select Year of Study</option>
+                                                        <option value="First Year">First Year</option>
+                                                        <option value="Second Year">Second Year</option>
+                                                        <option value="Third Year">Third Year</option>
+                                                        <option value="Fourth Year">Fourth Year</option>
+                                                        <option value="Certificate Programme">Certificate Programme</option>
+                                                        <option value="Foundation Programme">Foundation Programme</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-chocolate-600 mb-1">Interests</label>
+                                                <input
+                                                    type="text"
+                                                    name="interests"
+                                                    value={Array.isArray(editFormData.interests) ? editFormData.interests.join(', ') : ''}
+                                                    onChange={(e) => {
+                                                        const interests = e.target.value.split(',').map(i => i.trim()).filter(i => i);
+                                                        setEditFormData((prev: any) => ({ ...prev, interests }));
+                                                    }}
+                                                    placeholder="music, drama, art, meditation"
+                                                    className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-chocolate-600 mb-1">Message</label>
+                                                <textarea
+                                                    name="message"
+                                                    value={editFormData.message || ''}
+                                                    onChange={handleInputChangeEdit}
+                                                    rows={3}
+                                                    className="w-full px-3 py-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-mustard-500"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end space-x-3 pt-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={closeModals}
+                                                    className="px-4 py-2 text-chocolate-600 border border-cream-300 rounded-lg hover:bg-cream-50 transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    disabled={saving}
+                                                    className="px-4 py-2 bg-mustard-500 text-white rounded-lg hover:bg-mustard-600 disabled:opacity-50 transition-colors"
+                                                >
+                                                    {saving ? 'Saving...' : 'Save Changes'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

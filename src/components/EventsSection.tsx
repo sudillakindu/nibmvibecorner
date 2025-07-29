@@ -92,7 +92,7 @@ export const EventsSection = () => {
           setEvents(filteredAndSortedEvents);
         }
       } catch (error) {
-        console.error('Error fetching events:', error);
+        // console.error('Error fetching events:', error);
       } finally {
         setLoading(false);
       }

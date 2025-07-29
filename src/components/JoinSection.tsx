@@ -18,6 +18,7 @@ export const JoinSection = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [emailExists, setEmailExists] = useState(false);
+    const [studentIdExists, setStudentIdExists] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({
         name: '',
         email: '',
@@ -100,7 +101,7 @@ export const JoinSection = () => {
                     });
                 }
             } catch (err) {
-                console.error('Error fetching WhatsApp data:', err);
+                // console.error('Error fetching WhatsApp data:', err);
             }
         };
 
@@ -138,6 +139,13 @@ export const JoinSection = () => {
         } else if (name === 'email' && !value) {
             setEmailExists(false);
         }
+
+        // Check if student ID already exists when studentIndexId field changes
+        if (name === 'studentIndexId' && value) {
+            checkStudentIdExists(value);
+        } else if (name === 'studentIndexId' && !value) {
+            setStudentIdExists(false);
+        }
     };
 
     const checkEmailExists = async (email: string) => {
@@ -158,8 +166,31 @@ export const JoinSection = () => {
                 setEmailExists(false);
             }
         } catch (err) {
-            console.error('Error checking email:', err);
+            // console.error('Error checking email:', err);
             setEmailExists(false);
+        }
+    };
+
+    const checkStudentIdExists = async (studentId: string) => {
+        try {
+            // Normalize student ID (uppercase and trim)
+            const normalizedStudentId = studentId.toUpperCase().trim();
+
+            const applicationsRef = ref(database, 'applications');
+            const snapshot = await get(applicationsRef);
+
+            if (snapshot.exists()) {
+                const applications = snapshot.val();
+                const studentIdExists = Object.values(applications).some((app: any) =>
+                    app.studentIndexId && app.studentIndexId.toUpperCase().trim() === normalizedStudentId
+                );
+                setStudentIdExists(studentIdExists);
+            } else {
+                setStudentIdExists(false);
+            }
+        } catch (err) {
+            // console.error('Error checking student ID:', err);
+            setStudentIdExists(false);
         }
     };
 
@@ -204,11 +235,14 @@ export const JoinSection = () => {
             errors.email = 'Temporary/disposable email addresses are not allowed.';
             hasError = true;
         } else if (emailExists) {
-            errors.email = 'This email has already been used. Please use a different email.';
+            errors.email = 'This email has already been used for an application.';
             hasError = true;
         }
         if (!formState.studentIndexId.trim()) {
             errors.studentIndexId = 'Please enter your NIBM student ID.';
+            hasError = true;
+        } else if (studentIdExists) {
+            errors.studentIndexId = 'This student index id has already been used for an application.';
             hasError = true;
         }
         if (!formState.faculty) {
@@ -242,20 +276,27 @@ export const JoinSection = () => {
             // Push the data to Firebase Realtime Database
             const newApplicationRef = push(applicationsRef);
             await set(newApplicationRef, applicationData);
-
-            console.log('Application submitted successfully:', applicationData);
+            // console.log('Application submitted successfully:', applicationData);
 
             // Send confirmation email
+            let isEmailSend = false;
             try {
                 const emailSent = await sendClubApplicationEmail(applicationData);
                 if (emailSent) {
-                    console.log('Confirmation email sent successfully');
+                    isEmailSend = true;
+                    // console.log('Confirmation email sent successfully');
                 } else {
-                    console.warn('Failed to send confirmation email');
+                    // console.warn('Failed to send confirmation email');
                 }
             } catch (error) {
-                console.error('Error sending confirmation email:', error);
+                // console.error('Error sending confirmation email:', error);
             }
+
+            // Update the application with isEmailSend status
+            await set(newApplicationRef, {
+                ...applicationData,
+                isEmailSend,
+            });
 
             setIsSubmitted(true);
             createConfetti();
@@ -273,10 +314,11 @@ export const JoinSection = () => {
                     message: ''
                 });
                 setEmailExists(false);
+                setStudentIdExists(false);
             }, 100000);
 
         } catch (err) {
-            console.error('Error submitting application:', err);
+            // console.error('Error submitting application:', err);
         } finally {
             setIsSubmitting(false);
         }
@@ -538,7 +580,7 @@ export const JoinSection = () => {
                                             placeholder="Enter your NIBM student ID (e.g : MADSE241F-001)"
                                             pattern="[A-Z0-9\s-]+"
                                             title="Only capital letters, numbers, spaces, dots, and dashes are allowed"
-                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                            className={`w-full px-4 py-2 rounded-xl text-base transition-all duration-300
                                                         bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
                                                         border-2 border-chocolate-400 dark:border-saddle-600
                                                         placeholder-charcoal-400 dark:placeholder-cream-600
@@ -546,13 +588,20 @@ export const JoinSection = () => {
 
                                                         focus:outline-none
                                                         focus:ring-0
-                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        focus:border-yellow-500 dark:focus:border-yellow-400 ${studentIdExists
+                                                    ? 'border-red-500 dark:border-red-400 focus:border-red-500'
+                                                    : ''
+                                                }`}
                                         />
-                                        {fieldErrors.studentIndexId && (
+                                        {fieldErrors.studentIndexId ? (
                                             <div className="flex items-center mt-2 text-red-600 dark:text-red-400 text-sm">
                                                 <span>{fieldErrors.studentIndexId}</span>
                                             </div>
-                                        )}
+                                        ) : studentIdExists ? (
+                                            <div className="flex items-center mt-2 text-red-600 dark:text-red-400 text-sm">
+                                                <span>This student index id has already been used for an application.</span>
+                                            </div>
+                                        ) : null}
                                     </div>
 
                                     <div className="space-y-1">

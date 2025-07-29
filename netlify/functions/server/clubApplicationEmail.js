@@ -611,7 +611,7 @@ exports.handler = async (event, context) => {
         whatsappCommunityLink = data.whatsapp_community || whatsappCommunityLink;
       }
     } catch (error) {
-      console.error('Error fetching WhatsApp community link:', error);
+    //   console.error('Error fetching WhatsApp community link:', error);
       // Continue with default link if Firebase fails
     }
 
@@ -670,7 +670,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error sending emails:', error);
+    // console.error('Error sending emails:', error);
     return {
       statusCode: 500,
       headers: {

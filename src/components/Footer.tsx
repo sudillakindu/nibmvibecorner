@@ -1,33 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { InstagramIcon, TwitterIcon, FacebookIcon, YoutubeIcon, Mail, Phone, MapPin } from 'lucide-react';
-import { ref, get } from 'firebase/database';
-import { database } from '../firebase/firebase';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const [contactInfo, setContactInfo] = useState({
-    contact_number: '',
-    email: '',
-    address1: '',
-    address2: ''
-  });
-
-  useEffect(() => {
-    const fetchContactInfo = async () => {
-      try {
-        const footerRef = ref(database, 'footer/contact_us');
-        const snapshot = await get(footerRef);
-        
-        if (snapshot.exists()) {
-          setContactInfo(snapshot.val());
-        }
-      } catch (error) {
-        console.error('Error fetching contact info:', error);
-      }
-    };
-
-    fetchContactInfo();
-  }, []);
+  const contactInfo = {
+    contact_number: '0703476767',
+    email: 'vibecornernibm.info@gmail.com',
+    address1: '2nd Floor, No. 26, NSB Building,',
+    address2: 'අනගාරික ධර්මපාල මාවත, Matara'
+  };
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();

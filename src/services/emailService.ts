@@ -41,14 +41,14 @@ export const sendClubApplicationEmail = async (data: ClubApplicationEmailData): 
     const result = await response.json();
     
     if (result.success) {
-      console.log('Club application confirmation email sent successfully to:', data.email);
+      // console.log('Club application confirmation email sent successfully to:', data.email);
       return true;
     } else {
-      console.error('Failed to send club application email:', result.error);
+      // console.error('Failed to send club application email:', result.error);
       return false;
     }
   } catch (error) {
-    console.error('Error sending club application confirmation email:', error);
+    // console.error('Error sending club application confirmation email:', error);
     return false;
   }
 };
@@ -73,14 +73,14 @@ export const sendSignupApplicationEmail = async (data: SignupApplicationEmailDat
     const result = await response.json();
     
     if (result.success) {
-      console.log('Signup application email sent successfully to:', data.email);
+      // console.log('Signup application email sent successfully to:', data.email);
       return true;
     } else {
-      console.error('Failed to send signup application email:', result.error);
+      // console.error('Failed to send signup application email:', result.error);
       return false;
     }
   } catch (error) {
-    console.error('Error sending signup application email:', error);
+    // console.error('Error sending signup application email:', error);
     return false;
   }
 };

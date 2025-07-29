@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_GMAIL_USER: string
   readonly VITE_GMAIL_APP_PASSWORD: string
   readonly VITE_PORT: string
+  readonly VITE_IMGBB_API_KEY: string
 }
 
 interface ImportMeta {
