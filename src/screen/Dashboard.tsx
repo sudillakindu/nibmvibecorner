@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Headphones, TrendingUp, Building2, FileText, Grid3X3, Settings, MapPin, Bell, BarChart3, User, ArrowUp, ArrowDown, Music, Calendar, Award, UserCheck, Image, Crown, ArrowLeft, Plus, MicIcon, Palette, Heart, Users } from 'lucide-react';
+import { Search, Headphones, TrendingUp, Building2, FileText, Grid3X3, Settings, MapPin, Bell, BarChart3, User, ArrowUp, ArrowDown, Music, Calendar, Award, UserCheck, Image, Crown, ArrowLeft, Plus, MicIcon, Palette, Heart, Users, CheckIcon } from 'lucide-react';
 import { ref, push } from 'firebase/database';
 import { database } from '../firebase/firebase';
 
@@ -253,325 +253,422 @@ const Dashboard: React.FC = () => {
                 <div className="ml-64 flex-1 p-8">
                     {/* Conditional rendering based on active navigation */}
                     {activeNav === 'event' ? (
-                        <>
-                            {/* Header */}
-                            <div className="flex items-center justify-between mb-8">
-                                <div>
-                                    <h1 className="text-3xl font-bold text-gradient-mustard">Add New Event</h1>
-                                    <p className="text-chocolate-600 mt-1">Create an exciting new event for the NIBM Club</p>
+                        <section className="py-12 md:py-20 px-4 bg-gradient-to-br from-cream-50 via-white to-cream-100 dark:from-saddle-900/30 dark:via-charcoal-900 dark:to-saddle-900/20 relative overflow-hidden">
+                            {/* Enhanced decorative elements */}
+                            <div className="absolute top-10 left-5 w-40 h-40 md:w-80 md:h-80 rounded-full bg-chocolate-700/10 blur-3xl animate-float"></div>
+                            <div className="absolute bottom-10 right-5 w-60 h-60 md:w-96 md:h-96 rounded-full bg-mustard-500/10 blur-3xl animate-float-delay"></div>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-orange-500/5 blur-2xl animate-float-slow"></div>
+
+                            <div className="container mx-auto relative z-10 max-w-6xl">
+                                <div className="text-center mb-8 md:mb-12">
+                                    <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-chocolate-700 to-mustard-600 bg-clip-text text-transparent">
+                                        Create New Event
+                                    </h2>
+                                    <p className="text-lg md:text-xl text-charcoal-600 dark:text-cream-400 max-w-3xl mx-auto leading-relaxed">
+                                        Organize exciting events that bring our community together. Create memorable experiences 
+                                        through music, drama, art, and more.
+                                    </p>
                                 </div>
-                                <div className="flex items-center space-x-4">
-                                    <button className="relative p-2 text-chocolate-600 hover:text-mustard-600 transition-colors">
-                                        <Bell className="w-5 h-5" />
-                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full"></span>
-                                    </button>
-                                    <button className="p-2 text-chocolate-600 hover:text-mustard-600 transition-colors">
-                                        <BarChart3 className="w-5 h-5" />
-                                    </button>
-                                    <div className="flex items-center space-x-2 bg-white rounded-full px-4 py-2 shadow-sm">
-                                        <div className="w-8 h-8 bg-gradient-to-r from-mustard-400 to-orange-400 rounded-full flex items-center justify-center">
-                                            <User className="w-4 h-4 text-white" />
+
+                                <div className="max-w-5xl mx-auto backdrop-blur-xl bg-white/80 dark:bg-charcoal-900/80 rounded-3xl shadow-2xl overflow-hidden border border-white/30 dark:border-chocolate-700/30">
+                                    <div className="grid grid-cols-1 lg:grid-cols-5">
+                                        {/* Left side - Event Benefits */}
+                                        <div className="lg:col-span-2 bg-gradient-to-br from-chocolate-700 via-saddle-700 to-chocolate-800 text-white p-8 md:p-10 relative overflow-hidden">
+                                            {/* Background pattern */}
+                                            <div className="absolute inset-0 opacity-10">
+                                                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(244,196,48,0.3),transparent_50%)]"></div>
+                                            </div>
+
+                                            <div className="relative z-10">
+                                                <h3 className="text-2xl md:text-3xl font-bold mb-8 flex items-center">
+                                                    <span className="mr-3 text-3xl">🎉</span>
+                                                    Event Benefits
+                                                </h3>
+                                                <ul className="space-y-6">
+                                                    <li className="flex items-start group">
+                                                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-mustard-500/30 flex items-center justify-center mr-4 group-hover:bg-mustard-500/50 transition-colors">
+                                                            <CheckIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                                        </div>
+                                                        <span className="font-medium text-base md:text-lg group-hover:text-mustard-300 transition-colors">
+                                                            Connect with fellow students
+                                                        </span>
+                                                    </li>
+                                                    <li className="flex items-start group">
+                                                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/30 flex items-center justify-center mr-4 group-hover:bg-orange-500/50 transition-colors">
+                                                            <CheckIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                                        </div>
+                                                        <span className="font-medium text-base md:text-lg group-hover:text-orange-300 transition-colors">
+                                                            Showcase your talents
+                                                        </span>
+                                                    </li>
+                                                    <li className="flex items-start group">
+                                                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-mustard-500/30 flex items-center justify-center mr-4 group-hover:bg-mustard-500/50 transition-colors">
+                                                            <CheckIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                                        </div>
+                                                        <span className="font-medium text-base md:text-lg group-hover:text-mustard-300 transition-colors">
+                                                            Build leadership skills
+                                                        </span>
+                                                    </li>
+                                                    <li className="flex items-start group">
+                                                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-orange-500/30 flex items-center justify-center mr-4 group-hover:bg-orange-500/50 transition-colors">
+                                                            <CheckIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                                        </div>
+                                                        <span className="font-medium text-base md:text-lg group-hover:text-orange-300 transition-colors">
+                                                            Create lasting memories
+                                                        </span>
+                                                    </li>
+                                                    <li className="flex items-start group">
+                                                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-mustard-500/30 flex items-center justify-center mr-4 group-hover:bg-mustard-500/50 transition-colors">
+                                                            <CheckIcon className="w-5 h-5 md:w-6 md:h-6" />
+                                                        </div>
+                                                        <span className="font-medium text-base md:text-lg group-hover:text-mustard-300 transition-colors">
+                                                            Enhance university experience
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <span className="text-sm font-medium text-chocolate-700">Olga Tomarashvill</span>
+
+                                        {/* Right side - Event Form */}
+                                        <div className="lg:col-span-3 p-6 md:p-8">
+                                            <form onSubmit={handleSubmit} className="space-y-4">
+                                                {/* Event Name */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="eventName" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Event Name *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="eventName"
+                                                        name="eventName"
+                                                        value={formData.eventName}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        placeholder="Enter event name"
+                                                        className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                    />
+                                                </div>
+
+                                                {/* Organized By */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="organizedBy" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Organized By *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="organizedBy"
+                                                        name="organizedBy"
+                                                        value={formData.organizedBy}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        placeholder="Enter organizer name"
+                                                        className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                    />
+                                                </div>
+
+                                                {/* Description */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="description" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Description *
+                                                    </label>
+                                                    <textarea
+                                                        id="description"
+                                                        name="description"
+                                                        value={formData.description}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        rows={3}
+                                                        placeholder="Describe your event..."
+                                                        className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400
+                                                                    resize-none"
+                                                    />
+                                                </div>
+
+                                                {/* Event Type */}
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Event Type *
+                                                    </label>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                                        {eventTypes.map((type) => (
+                                                            <label
+                                                                key={type.value}
+                                                                className={`relative cursor-pointer p-3 bg-white/80 dark:bg-charcoal-800/80 rounded-xl border-2 border-chocolate-400 dark:border-saddle-600 focus-within:border-yellow-500 dark:focus-within:border-yellow-400 focus-within:ring-0 transition-all duration-300 group shadow-sm ${formData.eventType === type.value
+                                                                    ? 'border-yellow-500 dark:border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
+                                                                    : 'hover:border-yellow-400 dark:hover:border-yellow-500'
+                                                                    }`}
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="eventType"
+                                                                    value={type.value}
+                                                                    checked={formData.eventType === type.value}
+                                                                    onChange={handleInputChange}
+                                                                    className="sr-only"
+                                                                />
+                                                                <div className="text-center">
+                                                                    <span className="text-xl mb-1 block">{type.emoji}</span>
+                                                                    <span className="text-xs font-medium text-charcoal-700 dark:text-cream-300 group-hover:text-mustard-600 dark:group-hover:text-mustard-400 transition-colors">
+                                                                        {type.label}
+                                                                    </span>
+                                                                </div>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Date and Time */}
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                    <div className="space-y-1">
+                                                        <label htmlFor="eventDate" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                            Event Date *
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            id="eventDate"
+                                                            name="eventDate"
+                                                            value={formData.eventDate}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                                        text-charcoal-800 dark:text-white
+                                                                        focus:outline-none focus:ring-0
+                                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label htmlFor="startTime" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                            Start Time *
+                                                        </label>
+                                                        <input
+                                                            type="time"
+                                                            id="startTime"
+                                                            name="startTime"
+                                                            value={formData.startTime}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                                        text-charcoal-800 dark:text-white
+                                                                        focus:outline-none focus:ring-0
+                                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <label htmlFor="endTime" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                            End Time *
+                                                        </label>
+                                                        <input
+                                                            type="time"
+                                                            id="endTime"
+                                                            name="endTime"
+                                                            value={formData.endTime}
+                                                            onChange={handleInputChange}
+                                                            required
+                                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                                        text-charcoal-800 dark:text-white
+                                                                        focus:outline-none focus:ring-0
+                                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Venue */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="venue" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Venue *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="venue"
+                                                        name="venue"
+                                                        value={formData.venue}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        placeholder="Enter venue location"
+                                                        className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                    />
+                                                </div>
+
+                                                {/* Contact Person */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="contactPerson" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Contact Person *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="contactPerson"
+                                                        name="contactPerson"
+                                                        value={formData.contactPerson}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        placeholder="Enter contact person name"
+                                                        className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                    />
+                                                </div>
+
+                                                {/* Status */}
+                                                <div className="space-y-1">
+                                                    <label htmlFor="status" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        Status *
+                                                    </label>
+                                                    <select
+                                                        id="status"
+                                                        name="status"
+                                                        value={formData.status}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                        className="appearance-none w-full px-4 pr-8 py-2 rounded-xl text-base transition-all duration-300
+                                                                    bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                    border-2 border-chocolate-400 dark:border-saddle-600
+                                                                    text-charcoal-800 dark:text-white
+                                                                    focus:outline-none focus:ring-0
+                                                                    focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                    >
+                                                        {statusOptions.map((status) => (
+                                                            <option key={status.value} value={status.value}>
+                                                                {status.label}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                {/* Registration Required */}
+                                                <div className="space-y-1">
+                                                    <label className="flex items-center text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        <input
+                                                            type="checkbox"
+                                                            name="registrationRequired"
+                                                            checked={formData.registrationRequired}
+                                                            onChange={handleInputChange}
+                                                            className="rounded text-mustard-600 focus:ring-yellow-500 dark:focus:ring-yellow-400 mr-3 w-5 h-5"
+                                                        />
+                                                        Registration Required
+                                                    </label>
+                                                </div>
+
+                                                {/* Registration Deadline - Only show if registration is required */}
+                                                {formData.registrationRequired && (
+                                                    <div className="space-y-1">
+                                                        <label htmlFor="registrationDeadline" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                            Registration Deadline *
+                                                        </label>
+                                                        <input
+                                                            type="datetime-local"
+                                                            id="registrationDeadline"
+                                                            name="registrationDeadline"
+                                                            value={formData.registrationDeadline}
+                                                            onChange={handleInputChange}
+                                                            required={formData.registrationRequired}
+                                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                                        text-charcoal-800 dark:text-white
+                                                                        focus:outline-none focus:ring-0
+                                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {/* Max Participants - Only show if registration is required */}
+                                                {formData.registrationRequired && (
+                                                    <div className="space-y-1">
+                                                        <label htmlFor="maxParticipants" className="block text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                            Maximum Participants *
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            id="maxParticipants"
+                                                            name="maxParticipants"
+                                                            value={formData.maxParticipants}
+                                                            onChange={handleInputChange}
+                                                            required={formData.registrationRequired}
+                                                            min="1"
+                                                            placeholder="Enter maximum number of participants"
+                                                            className="w-full px-4 py-2 rounded-xl text-base transition-all duration-300
+                                                                        bg-white/80 dark:bg-charcoal-800/80 backdrop-blur-sm
+                                                                        border-2 border-chocolate-400 dark:border-saddle-600
+                                                                        placeholder-charcoal-400 dark:placeholder-cream-600
+                                                                        text-charcoal-800 dark:text-white
+                                                                        focus:outline-none focus:ring-0
+                                                                        focus:border-yellow-500 dark:focus:border-yellow-400"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {/* Is Active */}
+                                                <div className="space-y-1">
+                                                    <label className="flex items-center text-sm font-semibold text-charcoal-700 dark:text-cream-300 mb-0.5">
+                                                        <input
+                                                            type="checkbox"
+                                                            name="isActive"
+                                                            checked={formData.isActive}
+                                                            onChange={handleInputChange}
+                                                            className="rounded text-mustard-600 focus:ring-yellow-500 dark:focus:ring-yellow-400 mr-3 w-5 h-5"
+                                                        />
+                                                        Event is Active
+                                                    </label>
+                                                </div>
+
+                                                {/* Submit Button */}
+                                                <button
+                                                    type="submit"
+                                                    disabled={loading}
+                                                    className="w-full bg-gradient-to-r from-mustard-500 to-orange-500 hover:from-mustard-600 hover:to-orange-600 disabled:from-mustard-400 disabled:to-orange-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl text-lg flex items-center justify-center shadow-lg"
+                                                >
+                                                    {loading ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                                            <span>Creating Event...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="mr-2">🎉</span>
+                                                            Create Event
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="bg-white rounded-2xl shadow-lg border border-cream-200">
-                                {/* Event Form */}
-                                <div className="p-6">
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                        {/* Event Name */}
-                                        <div>
-                                            <label htmlFor="eventName" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Event Name *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="eventName"
-                                                name="eventName"
-                                                value={formData.eventName}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400"
-                                                placeholder="Enter event name"
-                                            />
-                                        </div>
-
-                                        {/* Organized By */}
-                                        <div>
-                                            <label htmlFor="organizedBy" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Organized By *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="organizedBy"
-                                                name="organizedBy"
-                                                value={formData.organizedBy}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400"
-                                                placeholder="Enter organizer name"
-                                            />
-                                        </div>
-
-                                        {/* Description */}
-                                        <div>
-                                            <label htmlFor="description" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Description *
-                                            </label>
-                                            <textarea
-                                                id="description"
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleInputChange}
-                                                required
-                                                rows={4}
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400 resize-none"
-                                                placeholder="Describe your event..."
-                                            />
-                                        </div>
-
-                                        {/* Image URL */}
-                                        <div>
-                                            <label htmlFor="imageUrl" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Event Image URL
-                                            </label>
-                                            <input
-                                                type="url"
-                                                id="imageUrl"
-                                                name="imageUrl"
-                                                value={formData.imageUrl}
-                                                onChange={handleInputChange}
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400"
-                                                placeholder="Enter image URL (optional)"
-                                            />
-                                        </div>
-
-                                        {/* Event Type */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Event Type *
-                                            </label>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                                {eventTypes.map((type) => (
-                                                    <label
-                                                        key={type.value}
-                                                        className={`relative cursor-pointer p-4 border-2 rounded-lg transition-all ${formData.eventType === type.value
-                                                            ? 'border-mustard-500 bg-mustard-50'
-                                                            : 'border-cream-300 hover:border-mustard-300'
-                                                            }`}
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="eventType"
-                                                            value={type.value}
-                                                            checked={formData.eventType === type.value}
-                                                            onChange={handleInputChange}
-                                                            className="sr-only"
-                                                        />
-                                                        <div className="text-center">
-                                                            <span className="text-2xl mb-2 block">{type.emoji}</span>
-                                                            <span className="text-sm font-medium text-chocolate-700">
-                                                                {type.label}
-                                                            </span>
-                                                        </div>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Date and Time */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div>
-                                                <label htmlFor="eventDate" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                    Event Date *
-                                                </label>
-                                                <input
-                                                    type="date"
-                                                    id="eventDate"
-                                                    name="eventDate"
-                                                    value={formData.eventDate}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="startTime" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                    Start Time *
-                                                </label>
-                                                <input
-                                                    type="time"
-                                                    id="startTime"
-                                                    name="startTime"
-                                                    value={formData.startTime}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="endTime" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                    End Time *
-                                                </label>
-                                                <input
-                                                    type="time"
-                                                    id="endTime"
-                                                    name="endTime"
-                                                    value={formData.endTime}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Venue */}
-                                        <div>
-                                            <label htmlFor="venue" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Venue *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="venue"
-                                                name="venue"
-                                                value={formData.venue}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400"
-                                                placeholder="Enter venue location"
-                                            />
-                                        </div>
-
-                                        {/* Contact Person */}
-                                        <div>
-                                            <label htmlFor="contactPerson" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Contact Person *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="contactPerson"
-                                                name="contactPerson"
-                                                value={formData.contactPerson}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900 placeholder-chocolate-400"
-                                                placeholder="Enter contact person name"
-                                            />
-                                        </div>
-
-                                        {/* Status */}
-                                        <div>
-                                            <label htmlFor="status" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                Status *
-                                            </label>
-                                            <select
-                                                id="status"
-                                                name="status"
-                                                value={formData.status}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                            >
-                                                {statusOptions.map((status) => (
-                                                    <option key={status.value} value={status.value}>
-                                                        {status.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        {/* Registration Required */}
-                                        <div>
-                                            <label className="flex items-center text-sm font-medium text-chocolate-700 mb-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="registrationRequired"
-                                                    checked={formData.registrationRequired}
-                                                    onChange={handleInputChange}
-                                                    className="mr-2 rounded text-mustard-600 focus:ring-mustard-500"
-                                                />
-                                                Registration Required
-                                            </label>
-                                        </div>
-
-                                        {/* Registration Deadline - Only show if registration is required */}
-                                        {formData.registrationRequired && (
-                                            <div>
-                                                <label htmlFor="registrationDeadline" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                    Registration Deadline *
-                                                </label>
-                                                <input
-                                                    type="datetime-local"
-                                                    id="registrationDeadline"
-                                                    name="registrationDeadline"
-                                                    value={formData.registrationDeadline}
-                                                    onChange={handleInputChange}
-                                                    required={formData.registrationRequired}
-                                                    className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                                />
-                                            </div>
-                                        )}
-
-                                        {/* Max Participants - Only show if registration is required */}
-                                        {formData.registrationRequired && (
-                                            <div>
-                                                <label htmlFor="maxParticipants" className="block text-sm font-medium text-chocolate-700 mb-2">
-                                                    Maximum Participants *
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    id="maxParticipants"
-                                                    name="maxParticipants"
-                                                    value={formData.maxParticipants}
-                                                    onChange={handleInputChange}
-                                                    required={formData.registrationRequired}
-                                                    min="1"
-                                                    className="w-full px-4 py-3 border border-cream-300 rounded-lg focus:ring-2 focus:ring-mustard-500 focus:border-transparent bg-white text-chocolate-900"
-                                                    placeholder="Enter maximum number of participants"
-                                                />
-                                            </div>
-                                        )}
-
-                                        {/* Is Active */}
-                                        <div>
-                                            <label className="flex items-center text-sm font-medium text-chocolate-700 mb-2">
-                                                <input
-                                                    type="checkbox"
-                                                    name="isActive"
-                                                    checked={formData.isActive}
-                                                    onChange={handleInputChange}
-                                                    className="mr-2 rounded text-mustard-600 focus:ring-mustard-500"
-                                                />
-                                                Event is Active
-                                            </label>
-                                        </div>
-
-                                        {/* Submit Button */}
-                                        <div className="pt-4">
-                                            <button
-                                                type="submit"
-                                                disabled={loading}
-                                                className="w-full bg-gradient-to-r from-mustard-500 to-orange-500 hover:from-mustard-600 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
-                                            >
-                                                {loading ? (
-                                                    <>
-                                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                                        <span>Adding Event...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Plus className="w-5 h-5" />
-                                                        <span>Add Event</span>
-                                                    </>
-                                                )}
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </>
+                        </section>
                     ) : activeNav === 'executive' ? (
                         <>
                             {/* Header */}
