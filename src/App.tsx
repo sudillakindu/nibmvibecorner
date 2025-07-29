@@ -24,7 +24,7 @@ export function App() {
     
     if (path === '/signin') {
       setCurrentPage('signin');
-    } else if (path === '/signup') {
+    } else if (path === '/signup12563') {
       setCurrentPage('signup');
     } else if (path === '/dashboard') {
       // Check if user is authorized to access dashboard
