@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
     });
 
     // Read and process the confirmation email template
-    const templatePathConfirmationHtml = path.join(__dirname, '../emailTemplate/clubApplicationConfirmation.html');
+    const templatePathConfirmationHtml = path.join(process.cwd(), 'emailTemplate/clubApplicationConfirmation.html');
     let confirmationHtml = fs.readFileSync(templatePathConfirmationHtml, 'utf8');
     
     confirmationHtml = confirmationHtml.replace(/\{\{name\}\}/g, name);
@@ -87,7 +87,7 @@ exports.handler = async (event, context) => {
     await transporter.sendMail(confirmationMailOptions);
 
     // Send notification email to Notification
-    const templatePathNotificationHtml = path.join(__dirname, '../emailTemplate/clubApplicationNotification.html');
+    const templatePathNotificationHtml = path.join(process.cwd(), 'emailTemplate/clubApplicationNotification.html');
     let notificationHtmlContent = fs.readFileSync(templatePathNotificationHtml, 'utf8');
 
     notificationHtmlContent = notificationHtmlContent.replace(/\{\{name\}\}/g, name);
